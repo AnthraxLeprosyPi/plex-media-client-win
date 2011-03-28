@@ -5,6 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using PlexMediaClient.Plex.Xml;
 using PlexMediaClient.Util;
+using System.Web;
 
 namespace PlexMediaClient.Gui {
     public static class Navigation {
@@ -52,7 +53,7 @@ namespace PlexMediaClient.Gui {
 
         static void BuildItemList(MediaContainer responseContainer) {
             List<ListItem> tmpList = new List<ListItem>();
-            History.Push(responseContainer);
+           
             if (responseContainer.Directory != null && responseContainer.Directory.Count > 0) { 
                tmpList.AddRange(responseContainer.Directory.ToList().ConvertAll<ListItem>(dic => new ListItem(dic)));
             }
@@ -72,9 +73,14 @@ namespace PlexMediaClient.Gui {
 
         internal static void FetchItems(ListItem listItem) {
             if (listItem != null) {
-                History.Push(PlexInterface.RequestSectionItems(new Uri(History.Peek().UriSource, listItem.Index)));
+                if (listItem.Directory != null) {
+                    History.Push(PlexInterface.RequestSectionItems(new Uri(History.Peek().UriSource, listItem.Index.Contains("?") ? listItem.Index : VirtualPathUtility.AppendTrailingSlash(listItem.Index))));
+                    BuildItemList(History.Peek());
+                } else if (listItem.Video != null) {
+                  
+                }
             }
-            BuildItemList(History.Peek());
+           
         }
 
         internal static void GetPrevious() {
