@@ -26,7 +26,17 @@ namespace PlexMediaClient {
             InitializeComponent();
             Navigation.OnItemsFetched += new Navigation.OnItemsFetchedEventHandler(Navigation_OnItemsFetched);
             Navigation.OnItemsFetchProgress += new Navigation.OnItemsFetchProgressEventHandler(Navigation_OnItemsFetchProgress);
-            Navigation.OnErrorOccured += new Navigation.OnErrorOccuredEventHandler(Navigation_OnErrorOccured);            
+            Navigation.OnErrorOccured += new Navigation.OnErrorOccuredEventHandler(Navigation_OnErrorOccured);
+            ArtWorkRetrieval.OnArtWorkRetrieved += new ArtWorkRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);
+        }
+
+        void ArtWorkRetrieval_OnArtWorkRetrieved() {
+            this.Invoke(new MethodInvoker(delegate() {
+                dataGridView1.SuspendLayout();
+                dataGridView1.InvalidateColumn(ArtWork.Index);               
+                dataGridView1.ResumeLayout();
+                Update();
+            }));
         }
 
         void Navigation_OnErrorOccured(Exception e) {

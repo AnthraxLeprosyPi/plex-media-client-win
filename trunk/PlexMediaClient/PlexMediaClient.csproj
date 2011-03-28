@@ -72,6 +72,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Plex\PlexInterface.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Util\ArtWorkRetrieval.cs" />
     <Compile Include="Util\Encryption.cs" />
     <Compile Include="Util\SettingsManager.cs" />
     <Compile Include="Util\XmlSerialization.cs" />
@@ -112,6 +113,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <COMReference Include="AXVLC">
+      <Guid>{DF2BBE39-40A8-433B-A279-073F48DA94B6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="AxWMPLib">
       <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -135,6 +145,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon_server_online.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\plex.iTunesArtwork.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
