@@ -1,3 +1,4 @@
+using System.Xml.Serialization;
 namespace PlexMediaClient.Plex.Xml
 {
     
@@ -774,6 +775,7 @@ namespace PlexMediaClient.Plex.Xml
             }
         }
 
+        [XmlIgnore]
         public System.Uri UriSource { get; set; }
     }
     

@@ -30,15 +30,16 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.splitContainerInner = new System.Windows.Forms.SplitContainer();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ArtWork = new System.Windows.Forms.DataGridViewImageColumn();
             this.splitContainerOuter = new System.Windows.Forms.SplitContainer();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.progressBarFetch = new System.Windows.Forms.ToolStripProgressBar();
-            this.titleDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.iMenuItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.listItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.Icon = new System.Windows.Forms.DataGridViewImageColumn();
+            this.titleDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerInner)).BeginInit();
             this.splitContainerInner.Panel1.SuspendLayout();
             this.splitContainerInner.SuspendLayout();
@@ -48,6 +49,7 @@
             this.splitContainerOuter.Panel2.SuspendLayout();
             this.splitContainerOuter.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.listItemBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -84,9 +86,9 @@
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.ColumnHeadersVisible = false;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ArtWork,
+            this.Icon,
             this.titleDataGridViewTextBoxColumn});
-            this.dataGridView1.DataSource = this.listItemBindingSource;
+            this.dataGridView1.DataSource = this.iMenuItemBindingSource;
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = System.Drawing.Color.Gray;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -107,18 +109,7 @@
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(300, 735);
             this.dataGridView1.TabIndex = 4;
-            // 
-            // ArtWork
-            // 
-            this.ArtWork.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.ArtWork.DataPropertyName = "ArtWork";
-            this.ArtWork.HeaderText = "ArtWork";
-            this.ArtWork.Image = global::PlexMediaClient.Properties.Resources.icon_empty_artwork;
-            this.ArtWork.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
-            this.ArtWork.Name = "ArtWork";
-            this.ArtWork.ReadOnly = true;
-            this.ArtWork.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.ArtWork.Width = 5;
+            this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
             // 
             // splitContainerOuter
             // 
@@ -198,6 +189,26 @@
             this.progressBarFetch.Step = 1;
             this.progressBarFetch.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             // 
+            // iMenuItemBindingSource
+            // 
+            this.iMenuItemBindingSource.DataSource = typeof(PlexMediaClient.Gui.IMenuItem);
+            // 
+            // listItemBindingSource
+            // 
+            this.listItemBindingSource.DataSource = typeof(PlexMediaClient.Gui.ListItem);
+            // 
+            // Icon
+            // 
+            this.Icon.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.Icon.DataPropertyName = "Icon";
+            this.Icon.HeaderText = "ArtWork";
+            this.Icon.Image = global::PlexMediaClient.Properties.Resources.icon_empty_artwork;
+            this.Icon.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
+            this.Icon.Name = "Icon";
+            this.Icon.ReadOnly = true;
+            this.Icon.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Icon.Width = 5;
+            // 
             // titleDataGridViewTextBoxColumn
             // 
             this.titleDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
@@ -205,10 +216,6 @@
             this.titleDataGridViewTextBoxColumn.HeaderText = "Title";
             this.titleDataGridViewTextBoxColumn.Name = "titleDataGridViewTextBoxColumn";
             this.titleDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // listItemBindingSource
-            // 
-            this.listItemBindingSource.DataSource = typeof(PlexMediaClient.Gui.ListItem);
             // 
             // FormPlexClientMain
             // 
@@ -220,7 +227,7 @@
             this.Controls.Add(this.splitContainerOuter);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.MinimumSize = new System.Drawing.Size(300, 768);
+            this.MinimumSize = new System.Drawing.Size(300, 766);
             this.Name = "FormPlexClientMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Form1";
@@ -236,6 +243,7 @@
             this.splitContainerOuter.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.listItemBindingSource)).EndInit();
             this.ResumeLayout(false);
 
@@ -253,7 +261,8 @@
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.ToolStripProgressBar progressBarFetch;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridViewImageColumn ArtWork;
+        private System.Windows.Forms.BindingSource iMenuItemBindingSource;
+        private System.Windows.Forms.DataGridViewImageColumn Icon;
         private System.Windows.Forms.DataGridViewTextBoxColumn titleDataGridViewTextBoxColumn;
 
     }

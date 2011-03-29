@@ -7,16 +7,27 @@ using System.Xml.Serialization;
 
 namespace PlexMediaClient.Plex {
     [Serializable]
-    class PlexServer {
-        public Uri UriPlexBase { get; private set; }
-        public String UserName { get; private set; }
-        public String UserPass { get; private set; }
+    public class PlexServer : IEquatable<PlexServer> {
+
+        public String HostName { get; set; }
+        public String HostAdress { get; set; }
+        public String UserName { get; set; }
+        public String UserPass { get; set; }
+        public bool IsBonjour { get; set; }
         const int PlexPort = 32400;
 
-        public PlexServer(string hostName, string userName, string userPass) {
-            UriPlexBase = new UriBuilder("http", hostName, PlexPort).Uri;
+        public PlexServer() { }
+
+        public PlexServer(string hostName, string hostAdress, string userName, string userPass) {
+            HostName = hostName;
+            HostAdress = hostAdress;
             UserName = userName;
             UserPass = Encryption.GetSHA1Hash(userName.ToLower() + Encryption.GetSHA1Hash(userPass));
+        }
+
+        public PlexServer(string hostName, string hostAdress) {
+            HostName = hostName;
+            HostAdress = hostAdress;
         }
 
         public override string ToString() {
@@ -30,5 +41,11 @@ namespace PlexMediaClient.Plex {
             }
         }
 
+        [XmlIgnore]
+        public Uri UriPlexBase { get { return new UriBuilder("http", HostAdress, PlexPort).Uri; } }
+
+        public bool Equals(PlexServer other) {
+            return HostAdress.Equals(other.HostAdress);
+        }
     }
 }

@@ -2,8 +2,42 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ZeroconfService;
+using PlexMediaClient.Plex;
+using System.Net;
 
 namespace PlexMediaClient.Util {
-    class BonjourDiscovery {
+    static class BonjourDiscovery {
+
+        private static NetServiceBrowser BonjourBrowser { get; set; }
+
+        public static event OnBonjourServerEventHandler OnBonjourServer;
+        public delegate void OnBonjourServerEventHandler(PlexServer bojourDiscoveredServer);
+
+        static BonjourDiscovery() {
+            BonjourBrowser = new NetServiceBrowser();
+            BonjourBrowser.DidFindDomain += new NetServiceBrowser.DomainFound(_browser_DidFindDomain);
+            BonjourBrowser.DidFindService += new NetServiceBrowser.ServiceFound(_browser_DidFindService);           
+        }
+
+        static void _browser_DidFindService(NetServiceBrowser browser, NetService service, bool moreComing) {
+            service.DidResolveService += new NetService.ServiceResolved(service_DidResolveService);
+            service.ResolveWithTimeout(60);
+        }
+
+        static void service_DidResolveService(NetService service) {
+            OnBonjourServer(new PlexServer(service.HostName, ((IPEndPoint)service.Addresses[0]).Address.ToString())); 
+        }
+
+        static void _browser_DidFindDomain(NetServiceBrowser browser, string domainName, bool moreComing) {
+            BonjourBrowser.SearchForService("_plexmediasvr._tcp", domainName);
+        }
+        public static void StartBonjourServerDiscovery() {
+            try {
+                BonjourBrowser.SearchForBrowseableDomains();
+            } catch {
+                //Debug ("Couldn't locate servers via Bonjour.");
+            }
+        }
     }
 }

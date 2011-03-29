@@ -49,7 +49,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="ZeroconfService, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="ZeroconfService, Version=0.6.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\ZeroconfService.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gui\EPlexItemTypes.cs" />
@@ -62,6 +65,8 @@
     <Compile Include="Gui\IPLexItemBase.cs" />
     <Compile Include="Gui\IPlexItemFolder.cs" />
     <Compile Include="Gui\ListItemBase.cs" />
+    <Compile Include="Gui\IMenuItem.cs" />
+    <Compile Include="Gui\ConfigurationItem.cs" />
     <Compile Include="Gui\MenuNavigation.cs" />
     <Compile Include="Gui\PlexItemBase.cs" />
     <Compile Include="Gui\PlexItemFolder.cs" />
@@ -82,8 +87,7 @@
     <Compile Include="Util\ArtWorkRetrieval.cs" />
     <Compile Include="Util\BonjourDiscovery.cs" />
     <Compile Include="Util\Encryption.cs" />
-    <Compile Include="Util\ServerManagement.cs" />
-    <Compile Include="Util\SettingsManager.cs" />
+    <Compile Include="Util\ServerManager.cs" />
     <Compile Include="Util\XmlSerialization.cs" />
     <EmbeddedResource Include="Gui\FormPlexClientMain.resx">
       <DependentUpon>FormPlexClientMain.cs</DependentUpon>
@@ -111,6 +115,7 @@
       <DependentUpon>PlexWebProtocol.xsd</DependentUpon>
     </None>
     <None Include="Properties\DataSources\PlexMediaCenter.Gui.ListItem.datasource" />
+    <None Include="Properties\DataSources\PlexMediaClient.Gui.IMenuItem.datasource" />
     <None Include="Properties\DataSources\PlexMediaClient.Gui.PlexItemBase.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

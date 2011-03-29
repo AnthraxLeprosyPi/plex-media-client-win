@@ -15,7 +15,7 @@ namespace PlexMediaClient.Gui {
         public static event OnErrorOccuredEventHandler OnErrorOccured;
         public delegate void OnErrorOccuredEventHandler(Exception e);
         public static event OnItemsFetchedEventHandler OnItemsFetched;
-        public delegate void OnItemsFetchedEventHandler(List<ListItem> fetchedItems);
+        public delegate void OnItemsFetchedEventHandler(List<IMenuItem> fetchedItems);
         public static event OnItemsFetchProgressEventHandler OnItemsFetchProgress;
         public delegate void OnItemsFetchProgressEventHandler(int progress);
 
@@ -53,15 +53,16 @@ namespace PlexMediaClient.Gui {
 
         static void BuildItemList(MediaContainer responseContainer) {
             List<ListItem> tmpList = new List<ListItem>();
-           
-            if (responseContainer.Directory != null && responseContainer.Directory.Count > 0) { 
-               tmpList.AddRange(responseContainer.Directory.ToList().ConvertAll<ListItem>(dic => new ListItem(dic)));
+
+            if (responseContainer.Directory != null && responseContainer.Directory.Count > 0) {
+                tmpList.AddRange(responseContainer.Directory.ToList().ConvertAll<ListItem>(dic => new ListItem(dic)));
             }
             if (responseContainer.Video != null && responseContainer.Video.Count > 0) {
                 tmpList.AddRange(responseContainer.Video.ToList().ConvertAll<ListItem>(vid => new ListItem(vid)));
             }
-            OnItemsFetched(tmpList);
+           // OnItemsFetched(tmpList);
         }
+        
 
         static void PlexInterface_OnPlexError(Exception e) {
             OnErrorOccured(e);
@@ -74,7 +75,7 @@ namespace PlexMediaClient.Gui {
         internal static void FetchItems(ListItem listItem) {
             if (listItem != null) {
                 if (listItem.Directory != null) {
-                    History.Push(PlexInterface.RequestSectionItems(new Uri(History.Peek().UriSource, listItem.Index.Contains("?") ? listItem.Index : VirtualPathUtility.AppendTrailingSlash(listItem.Index))));
+                    History.Push(PlexInterface.RequestPlexItems(new Uri(History.Peek().UriSource, listItem.Index.Contains("?") ? listItem.Index : VirtualPathUtility.AppendTrailingSlash(listItem.Index))));
                     BuildItemList(History.Peek());
                 } else if (listItem.Video != null) {
                   
@@ -88,6 +89,10 @@ namespace PlexMediaClient.Gui {
                 History.Pop();                
                 BuildItemList(History.Peek());
             }
+        }
+
+        internal static void BuildMenuItems(List<IMenuItem> ChildMenuItems) {
+            OnItemsFetched(ChildMenuItems);
         }
     }
 }
