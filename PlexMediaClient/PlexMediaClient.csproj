@@ -49,34 +49,43 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="ZeroconfService, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FormPlexClientMain.cs">
+    <Compile Include="Gui\EPlexItemTypes.cs" />
+    <Compile Include="Gui\FormPlexClientMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormPlexClientMain.Designer.cs">
+    <Compile Include="Gui\FormPlexClientMain.Designer.cs">
       <DependentUpon>FormPlexClientMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="Gui\ListItem.cs" />
-    <Compile Include="Gui\Navigation.cs" />
+    <Compile Include="Gui\IPLexItemBase.cs" />
+    <Compile Include="Gui\IPlexItemFolder.cs" />
+    <Compile Include="Gui\ListItemBase.cs" />
+    <Compile Include="Gui\MenuNavigation.cs" />
+    <Compile Include="Gui\PlexItemBase.cs" />
+    <Compile Include="Gui\PlexItemFolder.cs" />
+    <Compile Include="Gui\PlexItemVideo.cs" />
     <Compile Include="Plex\PlexServer.cs" />
-    <Compile Include="Plex\Xml\MediaContainer.cs">
-      <DependentUpon>MediaContainer.xsd</DependentUpon>
+    <Compile Include="Plex\Xml\PlexWebProtocol.cs">
+      <DependentUpon>PlexWebProtocol.xsd</DependentUpon>
     </Compile>
-    <Compile Include="Plex\Xml\MediaContainer.Designer.cs">
+    <Compile Include="Plex\Xml\PlexWebProtocol.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>MediaContainer.xsd</DependentUpon>
+      <DependentUpon>PlexWebProtocol.xsd</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="PlexMediaClientProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Plex\PlexInterface.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Util\ArtWorkRetrieval.cs" />
+    <Compile Include="Util\BonjourDiscovery.cs" />
     <Compile Include="Util\Encryption.cs" />
+    <Compile Include="Util\ServerManagement.cs" />
     <Compile Include="Util\SettingsManager.cs" />
     <Compile Include="Util\XmlSerialization.cs" />
-    <EmbeddedResource Include="FormPlexClientMain.resx">
+    <EmbeddedResource Include="Gui\FormPlexClientMain.resx">
       <DependentUpon>FormPlexClientMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -90,18 +99,19 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
-    <None Include="Plex\Xml\MediaContainer.xsc">
-      <DependentUpon>MediaContainer.xsd</DependentUpon>
+    <None Include="Plex\Xml\PlexWebProtocol.xsc">
+      <DependentUpon>PlexWebProtocol.xsd</DependentUpon>
     </None>
-    <None Include="Plex\Xml\MediaContainer.xsd">
+    <None Include="Plex\Xml\PlexWebProtocol.xsd">
       <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>MediaContainer.Designer.cs</LastGenOutput>
+      <LastGenOutput>PlexWebProtocol.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Plex\Xml\MediaContainer.xss">
-      <DependentUpon>MediaContainer.xsd</DependentUpon>
+    <None Include="Plex\Xml\PlexWebProtocol.xss">
+      <DependentUpon>PlexWebProtocol.xsd</DependentUpon>
     </None>
     <None Include="Properties\DataSources\PlexMediaCenter.Gui.ListItem.datasource" />
+    <None Include="Properties\DataSources\PlexMediaClient.Gui.PlexItemBase.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -113,15 +123,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="AXVLC">
-      <Guid>{DF2BBE39-40A8-433B-A279-073F48DA94B6}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="AxWMPLib">
       <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -148,6 +149,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\plex.iTunesArtwork.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Lib\dnssd.dll" />
+    <Content Include="Lib\ZeroconfService.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -8,7 +8,7 @@ using PlexMediaClient.Util;
 using System.Web;
 
 namespace PlexMediaClient.Gui {
-    public static class Navigation {
+    public static class MenuNavigation {
         //private static BackgroundWorker NewItemFetcher { get; set; }
         private static Stack<MediaContainer> History { get; set; }
 
@@ -19,7 +19,7 @@ namespace PlexMediaClient.Gui {
         public static event OnItemsFetchProgressEventHandler OnItemsFetchProgress;
         public delegate void OnItemsFetchProgressEventHandler(int progress);
 
-        static Navigation() {            
+        static MenuNavigation() {            
             //NewItemFetcher = new BackgroundWorker();
             //NewItemFetcher.DoWork += new DoWorkEventHandler(NewItemFetcher_DoWork);
             //NewItemFetcher.ProgressChanged += new ProgressChangedEventHandler(NewItemFetcher_ProgressChanged);
@@ -84,7 +84,7 @@ namespace PlexMediaClient.Gui {
         }
 
         internal static void GetPrevious() {
-            if (History.Count > 1) {
+            if (History != null && History.Count > 1) {
                 History.Pop();                
                 BuildItemList(History.Peek());
             }

@@ -19,6 +19,13 @@ namespace PlexMediaClient.Util {
 
         static ArtWorkRetrieval() {
             ImageCache = new Dictionary<string, Image>();
+            foreach(string plexType in Enum.GetNames(typeof(EPlexItemTypes))){
+                try {
+                    ImageCache.Add(plexType, Image.FromFile(String.Format(@"\Resources\{0}.png", plexType)));
+                } catch {
+                    //throw; 
+                }
+            }
         }
 
 

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using PlexMediaClient.Gui;
 
 namespace PlexMediaClient {
-    static class Program {
+    static class PlexMediaClientProgram {
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
         /// </summary>
