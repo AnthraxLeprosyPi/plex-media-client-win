@@ -6,6 +6,7 @@ using PlexMediaClient.Util;
 using System.Xml.Serialization;
 
 namespace PlexMediaClient.Plex {
+    [Serializable]
     class PlexServer {
         public Uri UriPlexBase { get; private set; }
         public String UserName { get; private set; }

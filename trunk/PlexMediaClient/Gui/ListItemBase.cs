@@ -28,6 +28,12 @@ namespace PlexMediaClient.Gui {
             ArtWorkIndex = video.thumb;
         }
 
+        public ListItem() {
+            Title = "Title";
+            Index = "Path";
+
+    }
+
         public string Title { get; private set; }
         public string Index { get; private set; }
 
