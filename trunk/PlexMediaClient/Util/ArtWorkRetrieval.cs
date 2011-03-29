@@ -19,7 +19,7 @@ namespace PlexMediaClient.Util {
 
         static ArtWorkRetrieval() {
             ImageCache = new Dictionary<string, Image>();
-            foreach(string plexType in Enum.GetNames(typeof(EPlexItemTypes))){
+            foreach (string plexType in Enum.GetNames(typeof(EPlexItemTypes))) {
                 try {
                     ImageCache.Add(plexType, Image.FromFile(String.Format(@"\Resources\{0}.png", plexType)));
                 } catch {
@@ -38,17 +38,21 @@ namespace PlexMediaClient.Util {
                 return Properties.Resources.icon_empty_artwork;
             } else if (!ImageCache.ContainsKey(imageIndex)) {
                 ImageCache.Add(imageIndex, Properties.Resources.icon_empty_artwork);
-                DownloadImage(imageIndex);
+                try {
+                    DownloadImage(imageIndex);
+                } catch { 
+                    //ToDo
+                }
             }
             return ImageCache[imageIndex];
         }
 
         internal static void DownloadImage(string imageIndex) {
             WebClient ArtWorkRetriever = new WebClient();
-            ArtWorkRetriever.Headers["X-Plex-User"] = PlexInterface.PlexServer.UserName;
-            ArtWorkRetriever.Headers["X-Plex-Pass"] = PlexInterface.PlexServer.UserPass;
+            ArtWorkRetriever.Headers["X-Plex-User"] = ServerManager.Instance.PlexServerCurrent.UserName;
+            ArtWorkRetriever.Headers["X-Plex-Pass"] = ServerManager.Instance.PlexServerCurrent.UserPass;
             ArtWorkRetriever.DownloadDataCompleted += new DownloadDataCompletedEventHandler(ArtWorkRetriever_DownloadDataCompleted);
-            ArtWorkRetriever.DownloadDataAsync(new Uri(PlexInterface.PlexServer.UriPlexBase, imageIndex), imageIndex);
+            ArtWorkRetriever.DownloadDataAsync(new Uri(ServerManager.Instance.PlexServerCurrent.UriPlexBase, imageIndex), imageIndex);
         }
 
         static void ArtWorkRetriever_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e) {

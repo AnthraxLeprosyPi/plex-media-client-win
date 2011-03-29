@@ -32,11 +32,11 @@ namespace PlexMediaClient.Gui {
             MenuNavigation.OnErrorOccured += new MenuNavigation.OnErrorOccuredEventHandler(Navigation_OnErrorOccured);
             ArtWorkRetrieval.OnArtWorkRetrieved += new ArtWorkRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);
         }
-
+      
         void ArtWorkRetrieval_OnArtWorkRetrieved() {
             this.Invoke(new MethodInvoker(delegate() {
                 dataGridView1.SuspendLayout();
-                dataGridView1.InvalidateColumn(ArtWork.Index);               
+                dataGridView1.InvalidateColumn(Icon.Index);               
                 dataGridView1.ResumeLayout();
                 Update();
             }));
@@ -51,22 +51,22 @@ namespace PlexMediaClient.Gui {
             this.Invoke(new MethodInvoker(delegate() { progressBarFetch.Value = progress; progressBarFetch.Invalidate(); Update(); }));
         }
 
-        void Navigation_OnItemsFetched(List<ListItem> fetchedItems) {
+        void Navigation_OnItemsFetched(List<IMenuItem> fetchedItems) {
             Cursor = Cursors.Default;
-            this.Invoke(new MethodInvoker(delegate() { listItemBindingSource.DataSource = fetchedItems; listItemBindingSource.ResetBindings(false); }));
+            this.Invoke(new MethodInvoker(delegate() { iMenuItemBindingSource.DataSource = fetchedItems; iMenuItemBindingSource.ResetBindings(false); }));
         }        
 
         protected override void OnLoad(EventArgs e) {
-            //Cursor = Cursors.WaitCursor;           
-            listItemBindingSource.Add(new ListItem());
-            listItemBindingSource.Add(new ListItem());
-            listItemBindingSource.Add(new ListItem());
-            listItemBindingSource.Add(new ListItem());
-            listItemBindingSource.Add(new ListItem());
-            listItemBindingSource.Add(new ListItem());
-            listItemBindingSource.Add(new ListItem());
+            //Cursor = Cursors.WaitCursor;         
+            ConfigurationItem c = new ConfigurationItem("Configuration");
+            c.ChildItems.Add(new ConfigurationItem("Server"));
+            List<IMenuItem> t = new List<IMenuItem>();
+            t.Add(c);
+
+            iMenuItemBindingSource.DataSource = t;
             this.Size = new Size(this.Size.Width,Screen.PrimaryScreen.WorkingArea.Height);
-           
+           // ServerManager.Instance.ToString();
+           //PlexInterface.Login();
             base.OnLoad(e);
         }
 
@@ -89,7 +89,9 @@ namespace PlexMediaClient.Gui {
             if (PlexInterface.IsBusy) {
                 return;
             }
-            MenuNavigation.FetchItems(((List<ListItem>)listItemBindingSource.DataSource)[e.RowIndex]);
+            
+            ((List<IMenuItem>)iMenuItemBindingSource.DataSource)[e.RowIndex].OnClicked(sender, null); ;
+            //MenuNavigation.FetchItems(((List<ListItem>)listItemBindingSource.DataSource)[e.RowIndex]);
         }
                 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData) {
@@ -115,12 +117,10 @@ namespace PlexMediaClient.Gui {
                     MenuNavigation.GetPrevious();
                     break;
                 case Keys.Alt | Keys.F4:
-                    this.Close();
-                    Application.Exit();
+                    this.Close();                    
                     break;
                 case Keys.F11:
                     ToggleFullScreen();
-                    return true;
                     break;
                 default:                    
                     break;
@@ -154,7 +154,6 @@ namespace PlexMediaClient.Gui {
                     break;
             }
             
-        }
-
+        }    
     }
 }
