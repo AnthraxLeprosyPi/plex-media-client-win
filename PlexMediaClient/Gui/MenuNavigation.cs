@@ -1,98 +1,94 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
 using PlexMediaClient.Plex.Xml;
 using PlexMediaClient.Util;
-using System.Web;
 
 namespace PlexMediaClient.Gui {
     public static class MenuNavigation {
-        //private static BackgroundWorker NewItemFetcher { get; set; }
-        private static Stack<MediaContainer> History { get; set; }
 
+        private static Stack<IMenuItem> History { get; set; }
+        public static bool IsFetching { get; set; }
+
+        public static event OnCloseEventHandler OnClose;
+        public delegate void OnCloseEventHandler(string reason);
         public static event OnErrorOccuredEventHandler OnErrorOccured;
         public delegate void OnErrorOccuredEventHandler(Exception e);
-        public static event OnItemsFetchedEventHandler OnItemsFetched;
-        public delegate void OnItemsFetchedEventHandler(List<IMenuItem> fetchedItems);
-        public static event OnItemsFetchProgressEventHandler OnItemsFetchProgress;
-        public delegate void OnItemsFetchProgressEventHandler(int progress);
+        public static event OnMenuItemsFetchedEventHandler OnMenuItemsFetched;
+        public delegate void OnMenuItemsFetchedEventHandler(List<IMenuItem> fetchedMenuItems);
 
-        static MenuNavigation() {            
-            //NewItemFetcher = new BackgroundWorker();
-            //NewItemFetcher.DoWork += new DoWorkEventHandler(NewItemFetcher_DoWork);
-            //NewItemFetcher.ProgressChanged += new ProgressChangedEventHandler(NewItemFetcher_ProgressChanged);
-            //NewItemFetcher.RunWorkerCompleted += new RunWorkerCompletedEventHandler(NewItemFetcher_RunWorkerCompleted);
-            //NewItemFetcher.WorkerReportsProgress = true;
-            //NewItemFetcher.WorkerSupportsCancellation = true;
+        static ActionItem BackItem { get; set; }
+
+        static MenuNavigation() {
+            History = new Stack<IMenuItem>();
+            BackItem = new ActionItem("Back...", Properties.Resources.icon_server_online, () => MenuNavigation.FetchPreviousMenu());
             PlexInterface.OnPlexError += new PlexInterface.OnPlexErrorEventHandler(PlexInterface_OnPlexError);
             PlexInterface.OnPlexConnected += new PlexInterface.OnPlexConnectedEventHandler(PlexInterface_OnPlexConnected);
         }
 
-        static void PlexInterface_OnPlexConnected(MediaContainer plexSections) {
-            History = new Stack<MediaContainer>();
-            History.Push(plexSections);
-            BuildItemList(plexSections);
-        }
-
-        //static void NewItemFetcher_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-        //    throw new NotImplementedException();
-        //}
-
-        //static void NewItemFetcher_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-        //    throw new NotImplementedException();
-        //}
-
-        //static void NewItemFetcher_DoWork(object sender, DoWorkEventArgs e) {
-            
-        //    throw new NotImplementedException();
-        //}
-
-
-
-        static void BuildItemList(MediaContainer responseContainer) {
-            List<ListItem> tmpList = new List<ListItem>();
-
-            if (responseContainer.Directory != null && responseContainer.Directory.Count > 0) {
-                tmpList.AddRange(responseContainer.Directory.ToList().ConvertAll<ListItem>(dic => new ListItem(dic)));
-            }
-            if (responseContainer.Video != null && responseContainer.Video.Count > 0) {
-                tmpList.AddRange(responseContainer.Video.ToList().ConvertAll<ListItem>(vid => new ListItem(vid)));
-            }
-           // OnItemsFetched(tmpList);
-        }
-        
-
         static void PlexInterface_OnPlexError(Exception e) {
             OnErrorOccured(e);
         }
-      
-        internal static void FetchItems() {
-            BuildItemList(null);
+
+        static void PlexInterface_OnPlexConnected(MediaContainer plexSections) {
+            BuildSubMenu(GetCreatePlexMenuItem(plexSections));
         }
 
-        internal static void FetchItems(ListItem listItem) {
-            if (listItem != null) {
-                if (listItem.Directory != null) {
-                    History.Push(PlexInterface.RequestPlexItems(new Uri(History.Peek().UriSource, listItem.Index.Contains("?") ? listItem.Index : VirtualPathUtility.AppendTrailingSlash(listItem.Index))));
-                    BuildItemList(History.Peek());
-                } else if (listItem.Video != null) {
-                  
-                }
-            }
-           
-        }
-
-        internal static void GetPrevious() {
+        internal static void FetchPreviousMenu() {
             if (History != null && History.Count > 1) {
-                History.Pop();                
-                BuildItemList(History.Peek());
+                History.Pop();
+                BuildSubMenu(History.Peek());
             }
         }
 
-        internal static void BuildMenuItems(List<IMenuItem> ChildMenuItems) {
-            OnItemsFetched(ChildMenuItems);
+        internal static void BuildSubMenu(IMenuItem parentItem) {
+            History.Push(parentItem);        
+            if (parentItem is PlexMenuItem ) {
+                OnMenuItemsFetched(FetchSubMenu(parentItem));
+            } else if (parentItem.SubMenu.Count > 0) {
+                if (History.Count > 1 && !parentItem.SubMenu.Contains(BackItem)) {
+                    parentItem.SubMenu.Add(BackItem);
+                }
+                OnMenuItemsFetched(parentItem.SubMenu);
+            } else {
+                return;
+            }    
+              
+        }
+
+        private static List<IMenuItem> FetchSubMenu(IMenuItem parentItem) {
+            IsFetching = true;
+            parentItem.SubMenu = GetSubMenuItems(PlexInterface.RequestPlexItems(parentItem.Path));
+            parentItem.SubMenu.Add(BackItem);
+            IsFetching = false;
+            return parentItem.SubMenu;
+        }
+
+        private static IMenuItem GetCreatePlexMenuItem(MediaContainer plexResponseConatiner) {
+            PlexMenuItem newMenuItem = new PlexMenuItem(plexResponseConatiner.title1, plexResponseConatiner.UriSource);
+            newMenuItem.SubMenu = GetSubMenuItems(plexResponseConatiner);
+            return newMenuItem;
+        }
+
+        private static List<IMenuItem> GetSubMenuItems(MediaContainer plexResponseConatiner) {
+            //Add ActionItems
+            return new List<IMenuItem>();
+        }
+
+        internal static void ShowMenuServerSections() {
+            MenuItem main = new MenuItem("Main");
+            MenuItem c = new MenuItem("Configuration");
+            c.SubMenu.Add(new MenuItem("Server"));
+            c.SubMenu.Add(new MenuItem("Server"));
+            c.SubMenu.Add(new MenuItem("Server"));
+            c.SubMenu.Add(new MenuItem("Server"));
+            c.SubMenu.Add(new MenuItem("Server"));
+            main.SubMenu.Add(c);
+            main.SubMenu.Add(new ActionItem("Exit", Properties.Resources.icon_server_offline, () => OnClose("User exited...")));
+            BuildSubMenu(main);
+        }
+
+        internal static void ShowMenuServerSelection() {
+            throw new NotImplementedException();
         }
     }
 }

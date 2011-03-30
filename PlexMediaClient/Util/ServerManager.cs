@@ -27,10 +27,6 @@ namespace PlexMediaClient.Util {
         }
         public static ServerManager Instance { get { return instance; } }
 
-
-
-
-
         private List<PlexServer> PlexServers { get; set; }
         public PlexServer PlexServerCurrent { get; private set; }
 
@@ -51,7 +47,7 @@ namespace PlexMediaClient.Util {
                 return;
             }
             try {
-                XmlSerialization.Serialize("PlexServers.xml", plexServers.Where(ser => ser.IsBonjour).ToList());
+                XmlSerialization.Serialize("PlexServers.xml", plexServers.Where(ser => !ser.IsBonjour).ToList());
             } catch {
                 //ToDo Log
             }

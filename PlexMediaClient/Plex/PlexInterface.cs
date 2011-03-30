@@ -59,9 +59,17 @@ namespace PlexMediaClient.Util {
                 return requestedContainer;
             } catch (Exception e) {
                 OnPlexError(e);
-                return default(MediaContainer);
+                return null;
             }
         }
 
+
+        internal static bool TryConnectLastServer() {
+            return true;
+        }
+
+        internal static bool LoadAndDiscoverServers() {
+            return false;
+        }
     }
 }

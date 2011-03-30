@@ -13,7 +13,7 @@ namespace PlexMediaClient {
         static void Main() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormPlexClientMain());
+            Application.Run(new FormPlexClientMain());      
         }
     }
 }

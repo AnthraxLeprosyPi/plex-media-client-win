@@ -5,9 +5,11 @@ using System.Text;
 using System.Drawing;
 
 namespace PlexMediaClient.Gui {
-    public interface IMenuItem  {
+    public interface IMenuItem : IEquatable<IMenuItem>{
         String Title { get; set; }
         Image Icon { get; }
+        Uri Path { get; set; } 
+        List<IMenuItem> SubMenu { get; set; }
 
         void OnClicked(object sender, EventArgs e);
     }
