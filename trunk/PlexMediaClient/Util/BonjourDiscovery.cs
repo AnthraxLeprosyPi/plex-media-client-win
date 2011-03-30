@@ -21,19 +21,45 @@ namespace PlexMediaClient.Util {
         }
 
         static void _browser_DidFindService(NetServiceBrowser browser, NetService service, bool moreComing) {
-            service.DidResolveService += new NetService.ServiceResolved(service_DidResolveService);
-            service.ResolveWithTimeout(60);
+            try {
+                service.DidResolveService += new NetService.ServiceResolved(service_DidResolveService);
+                service.ResolveWithTimeout(60);
+            } catch (Exception e) {
+                
+                throw e;
+            }
         }
 
         static void service_DidResolveService(NetService service) {
-            OnBonjourServer(new PlexServer(service.HostName, ((IPEndPoint)service.Addresses[0]).Address.ToString())); 
+            try {
+                PlexServer bonjourServer = new PlexServer(service.HostName, ((IPEndPoint)service.Addresses[0]).Address.ToString());
+                bonjourServer.IsBonjour = true;
+                OnBonjourServer(bonjourServer);
+            } catch (Exception e) {
+                
+                throw e;
+            }
         }
 
         static void _browser_DidFindDomain(NetServiceBrowser browser, string domainName, bool moreComing) {
-            BonjourBrowser.SearchForService("_plexmediasvr._tcp", domainName);
-        }
-        public static void StartBonjourServerDiscovery() {
             try {
+                BonjourBrowser.SearchForService("_plexmediasvr._tcp", domainName);
+            } catch (Exception e) {
+
+                throw e;
+            }
+        }
+        public static void StartBonjourDiscovery() {
+            try {
+                BonjourBrowser.SearchForBrowseableDomains();
+            } catch {
+                //Debug ("Couldn't locate servers via Bonjour.");
+            }
+        }
+
+        public static void RefreshBonjourDiscovery() {
+            try {
+                BonjourBrowser.Stop();
                 BonjourBrowser.SearchForBrowseableDomains();
             } catch {
                 //Debug ("Couldn't locate servers via Bonjour.");

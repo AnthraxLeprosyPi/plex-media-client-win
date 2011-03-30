@@ -10,6 +10,8 @@ using System;
 using PlexMediaClient.Util;
 using PlexMediaClient.Gui;
 using PlexMediaClient.Plex.Xml;
+using System.Threading;
+using PlexMediaClient.Plex;
 
 namespace PlexMediaClient.Gui {
     public partial class FormPlexClientMain : Form {
@@ -64,10 +66,12 @@ namespace PlexMediaClient.Gui {
             // ServerManager.Instance.ToString();
             //PlexInterface.Login();
             if (PlexInterface.TryConnectLastServer()) {
-                MenuNavigation.ShowMenuServerSections();
-            } else if (PlexInterface.LoadAndDiscoverServers()) {
+                MenuNavigation.ShowMenuRoot();
+            } else if (PlexInterface.PlexServersAvailable) {
                 MenuNavigation.ShowMenuServerSelection();
             } else if (ShowErrorMessage("Unable to start PlexMediaCenter - Please check network connection...") == DialogResult.Retry) {
+                ServerManager.Instance.RefrehBonjourServers();
+                Thread.Sleep(500);
                 OnLoad(e);
             } else {
                 this.Close();

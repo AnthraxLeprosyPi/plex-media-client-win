@@ -14,8 +14,7 @@ namespace PlexMediaClient.Gui {
             this.p = p;
             this.uri = uri;
         }
-        #region IMenuItem Members
-
+        
         public string Title {
             get {
                 throw new NotImplementedException();
@@ -30,37 +29,22 @@ namespace PlexMediaClient.Gui {
         }
 
         public Uri Path {
-            get { return Path; }
-            set {
-                if(value.AbsoluteUri.Contains("?")){
-                    Path = value;
-                }else{                    
-                    Path = new Uri(VirtualPathUtility.AppendTrailingSlash(value.AbsoluteUri));                   
-                } 
-            }
+            get;
+            set;
+            //{
+            //    if (value.AbsoluteUri.Contains("?")) {
+            //        Path = value;
+            //    } else {
+            //        Path = new Uri(VirtualPathUtility.AppendTrailingSlash(value.AbsoluteUri));
+            //    }
+            //}
         }
 
-        public List<IMenuItem> SubMenu {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
-                throw new NotImplementedException();
-            }
-        }
+        public List<IMenuItem> SubMenu { get; set; }
 
         public void OnClicked(object sender, EventArgs e) {
             throw new NotImplementedException();
         }
-
-        #endregion
-
-        #region IEquatable<IMenuItem> Members
-
-        public bool Equals(IMenuItem other) {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+     
     }
 }

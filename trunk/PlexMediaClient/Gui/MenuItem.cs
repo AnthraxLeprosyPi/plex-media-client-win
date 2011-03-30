@@ -25,13 +25,5 @@ namespace PlexMediaClient.Gui {
         public virtual void OnClicked(object sender, EventArgs e) {
             MenuNavigation.BuildSubMenu(this);
         }
-
-        #region IEquatable<IMenuItem> Members
-
-        public bool Equals(IMenuItem other) {
-            return this.Equals(other);
-        }
-
-        #endregion
    }
 }

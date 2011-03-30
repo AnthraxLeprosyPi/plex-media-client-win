@@ -7,8 +7,9 @@ using PlexMediaClient.Gui;
 using PlexMediaClient.Plex;
 using System.IO;
 using System.Drawing;
+using PlexMediaClient.Util;
 
-namespace PlexMediaClient.Util {
+namespace PlexMediaClient.Plex {
     static class PlexInterface {
 
         private static WebClient WebClient { get; set; }
@@ -47,7 +48,7 @@ namespace PlexMediaClient.Util {
             TryGetPlexSections(plexServer);
         }
 
-        private static void TryGetPlexSections(PlexServer plexServer) {
+        public static void TryGetPlexSections(PlexServer plexServer) {
             OnPlexConnected(RequestPlexItems(plexServer.UriPlexSections));
             IsConnected = true;
         }
@@ -68,8 +69,10 @@ namespace PlexMediaClient.Util {
             return true;
         }
 
-        internal static bool LoadAndDiscoverServers() {
-            return false;
+        internal static bool PlexServersAvailable {
+            get {
+                return ServerManager.Instance.PlexServers != null && ServerManager.Instance.PlexServers.Count > 0;
+            }
         }
     }
 }

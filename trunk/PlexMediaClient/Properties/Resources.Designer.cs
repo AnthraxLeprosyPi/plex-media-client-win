@@ -67,6 +67,13 @@ namespace PlexMediaClient.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap icon_server_bonjour {
+            get {
+                object obj = ResourceManager.GetObject("icon_server_bonjour", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap icon_server_offline {
             get {
                 object obj = ResourceManager.GetObject("icon_server_offline", resourceCulture);
