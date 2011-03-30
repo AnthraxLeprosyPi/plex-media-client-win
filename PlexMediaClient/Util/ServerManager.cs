@@ -11,6 +11,8 @@ namespace PlexMediaClient.Util {
 
         static readonly ServerManager instance = new ServerManager();
 
+        public static event OnPlexServersChangedEventHandler OnPlexServersChanged;
+        public delegate void OnPlexServersChangedEventHandler(List<PlexServer> updatedServerList);
 
         // Explicit static constructor to tell C# compiler
         // not to mark type as beforefieldinit
@@ -18,8 +20,9 @@ namespace PlexMediaClient.Util {
         }
 
         ServerManager() {
-            PlexServers = LoadPlexServers();       
-            StartBonjourDiscovery();
+            PlexServers = LoadPlexServers();
+            BonjourDiscovery.OnBonjourServer += new BonjourDiscovery.OnBonjourServerEventHandler(BonjourDiscovery_OnBonjourServer);
+            BonjourDiscovery.StartBonjourDiscovery();
         }
 
         ~ServerManager() {
@@ -27,7 +30,7 @@ namespace PlexMediaClient.Util {
         }
         public static ServerManager Instance { get { return instance; } }
 
-        private List<PlexServer> PlexServers { get; set; }
+        public List<PlexServer> PlexServers { get; private set; }
         public PlexServer PlexServerCurrent { get; private set; }
 
         private List<PlexServer> LoadPlexServers() {
@@ -61,17 +64,17 @@ namespace PlexMediaClient.Util {
             //Login(server);
         }
 
-        private void StartBonjourDiscovery() {
-            BonjourDiscovery.OnBonjourServer += new BonjourDiscovery.OnBonjourServerEventHandler(BonjourDiscovery_OnBonjourServer);
-            BonjourDiscovery.StartBonjourServerDiscovery();
-        }
-
         void BonjourDiscovery_OnBonjourServer(PlexServer bojourDiscoveredServer) {
             if (!PlexServers.Contains<PlexServer>(bojourDiscoveredServer)) {
                 PlexServers.Add(bojourDiscoveredServer);
+                OnPlexServersChanged(PlexServers);
             }
         }
 
-
+        public void RefrehBonjourServers() {
+            PlexServers.RemoveAll(svr => svr.IsBonjour);
+            OnPlexServersChanged(PlexServers);
+            BonjourDiscovery.RefreshBonjourDiscovery();
+        }
     }
 }

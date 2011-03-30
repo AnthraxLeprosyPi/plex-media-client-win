@@ -13,6 +13,8 @@ namespace PlexMediaClient.Plex {
         public String HostAdress { get; set; }
         public String UserName { get; set; }
         public String UserPass { get; set; }
+
+        public bool IsConnected { get; set; }
         public bool IsBonjour { get; set; }
         const int PlexPort = 32400;
 

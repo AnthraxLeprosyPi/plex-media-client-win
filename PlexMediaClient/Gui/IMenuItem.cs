@@ -5,7 +5,7 @@ using System.Text;
 using System.Drawing;
 
 namespace PlexMediaClient.Gui {
-    public interface IMenuItem : IEquatable<IMenuItem>{
+    public interface IMenuItem {
         String Title { get; set; }
         Image Icon { get; }
         Uri Path { get; set; } 
