@@ -27,17 +27,23 @@ namespace PlexMediaClient.Gui {
             SetStyle(ControlStyles.OptimizedDoubleBuffer |
                         ControlStyles.UserPaint |
                         ControlStyles.AllPaintingInWmPaint, true);
-            MenuNavigation.OnItemsFetched += new MenuNavigation.OnItemsFetchedEventHandler(Navigation_OnItemsFetched);
-            MenuNavigation.OnItemsFetchProgress += new MenuNavigation.OnItemsFetchProgressEventHandler(Navigation_OnItemsFetchProgress);
+            MenuNavigation.OnClose += new MenuNavigation.OnCloseEventHandler(MenuNavigation_OnClose);
+            MenuNavigation.OnMenuItemsFetched += new MenuNavigation.OnMenuItemsFetchedEventHandler(Navigation_OnItemsFetched);
             MenuNavigation.OnErrorOccured += new MenuNavigation.OnErrorOccuredEventHandler(Navigation_OnErrorOccured);
             ArtWorkRetrieval.OnArtWorkRetrieved += new ArtWorkRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);
         }
-      
+
+        void MenuNavigation_OnClose(string reason) {
+            Close();
+        }
+
+        private IMenuItem SelectedMenuItem { get; set; }
+
         void ArtWorkRetrieval_OnArtWorkRetrieved() {
             this.Invoke(new MethodInvoker(delegate() {
-                dataGridView1.SuspendLayout();
-                dataGridView1.InvalidateColumn(Icon.Index);               
-                dataGridView1.ResumeLayout();
+                MenuPane.SuspendLayout();
+                MenuPane.InvalidateColumn(iconDataGridViewImageColumn.Index);
+                MenuPane.ResumeLayout();
                 Update();
             }));
         }
@@ -47,113 +53,111 @@ namespace PlexMediaClient.Gui {
             this.Invoke(new MethodInvoker(delegate() { MessageBox.Show(e.Message, "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error); }));
         }
 
-        void Navigation_OnItemsFetchProgress(int progress) {
-            this.Invoke(new MethodInvoker(delegate() { progressBarFetch.Value = progress; progressBarFetch.Invalidate(); Update(); }));
-        }
-
         void Navigation_OnItemsFetched(List<IMenuItem> fetchedItems) {
             Cursor = Cursors.Default;
             this.Invoke(new MethodInvoker(delegate() { iMenuItemBindingSource.DataSource = fetchedItems; iMenuItemBindingSource.ResetBindings(false); }));
-        }        
+        }
 
         protected override void OnLoad(EventArgs e) {
-            //Cursor = Cursors.WaitCursor;         
-            ConfigurationItem c = new ConfigurationItem("Configuration");
-            c.ChildItems.Add(new ConfigurationItem("Server"));
-            List<IMenuItem> t = new List<IMenuItem>();
-            t.Add(c);
+            //Cursor = Cursors.WaitCursor;                     
+            this.Size = new Size(this.Size.Width, Screen.PrimaryScreen.WorkingArea.Height);
+            // ServerManager.Instance.ToString();
+            //PlexInterface.Login();
+            if (PlexInterface.TryConnectLastServer()) {
+                MenuNavigation.ShowMenuServerSections();
+            } else if (PlexInterface.LoadAndDiscoverServers()) {
+                MenuNavigation.ShowMenuServerSelection();
+            } else if (ShowErrorMessage("Unable to start PlexMediaCenter - Please check network connection...") == DialogResult.Retry) {
+                OnLoad(e);
+            } else {
+                this.Close();
+            }
 
-            iMenuItemBindingSource.DataSource = t;
-            this.Size = new Size(this.Size.Width,Screen.PrimaryScreen.WorkingArea.Height);
-           // ServerManager.Instance.ToString();
-           //PlexInterface.Login();
             base.OnLoad(e);
         }
 
-        
-        private void toolStripButtonExit_Click(object sender, EventArgs e) {
-            Close();
+        private DialogResult ShowErrorMessage(string errorMessage) {
+            return MessageBox.Show(errorMessage, "PlexMediaClient - Error!", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
         }
 
-        private void toolStripButton1_Paint(object sender, PaintEventArgs e) {
-            this.toolStripLabel1.BackgroundImage = ImageConnectionState;
-        }
 
-        private void toolStripLabel1_Click(object sender, EventArgs e) {
-            if (!PlexInterface.IsConnected) {
-                PlexInterface.Reconnect();
-            }
-        }
 
-        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e) {
+        private void menuPane_CellDoubleClick(object sender, DataGridViewCellEventArgs e) {
             if (PlexInterface.IsBusy) {
                 return;
             }
-            
-            ((List<IMenuItem>)iMenuItemBindingSource.DataSource)[e.RowIndex].OnClicked(sender, null); ;
+            SelectedMenuItem.OnClicked(sender, e);
+
             //MenuNavigation.FetchItems(((List<ListItem>)listItemBindingSource.DataSource)[e.RowIndex]);
         }
-                
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData) {
             switch (keyData) {
                 case Keys.Up:
                 case Keys.Down:
-                    dataGridView1.Select();
-                    return base.ProcessCmdKey(ref msg, keyData);       
-                    
+                    if (!MenuPane.Focused) {
+                        MenuPane.Select();                        
+                    }
+                    return base.ProcessCmdKey(ref msg, keyData);
                 case Keys.Enter:
+                case Keys.Select:
+                    if (SelectedMenuItem != null) {
+                        SelectedMenuItem.OnClicked(null, null);
+                    }
+                    break;
                 case Keys.MediaPlayPause:
                 case Keys.Play:
-                    if (PlexInterface.IsBusy || !PlexInterface.IsConnected) {
-                        break;
-                    }
-                    if (dataGridView1.SelectedRows != null) {
-                        MenuNavigation.FetchItems(((List<ListItem>)listItemBindingSource.DataSource)[dataGridView1.SelectedRows[0].Index]);
-                    }
+                    //MediaPlayer.PlayItem();
                     break;
                 case Keys.Back:
                 case Keys.BrowserBack:
                 case Keys.Escape:
-                    MenuNavigation.GetPrevious();
+                    MenuNavigation.FetchPreviousMenu();
                     break;
                 case Keys.Alt | Keys.F4:
-                    this.Close();                    
+                    this.Close();
                     break;
                 case Keys.F11:
                     ToggleFullScreen();
                     break;
-                default:                    
+                default:
                     break;
             }
             return true;
         }
 
-        
-        private void ToggleFullScreen() {           
+
+        private void ToggleFullScreen() {
             switch (WindowState) {
-                case FormWindowState.Maximized:                   
-                    WindowState = FormWindowState.Normal;                    
+                case FormWindowState.Maximized:
+                    WindowState = FormWindowState.Normal;
                     break;
                 case FormWindowState.Minimized:
                 case FormWindowState.Normal:
                 default:
                     WindowState = FormWindowState.Maximized;
                     break;
-            }            
+            }
         }
 
         private void FormPlexClientMain_SizeChanged(object sender, EventArgs e) {
-                switch (WindowState) {
+            switch (WindowState) {
                 case FormWindowState.Maximized:
                     splitContainerInner.Panel2Collapsed = false;
                     break;
                 case FormWindowState.Minimized:
-                case FormWindowState.Normal:                
+                case FormWindowState.Normal:
                 default:
                     splitContainerInner.Panel2Collapsed = true;
                     break;
             }
-            
-        }    
+
+        }
+
+        private void menuPane_SelectionChanged(object sender, EventArgs e) {
+            try {
+                SelectedMenuItem = ((List<IMenuItem>)iMenuItemBindingSource.DataSource)[MenuPane.SelectedRows[0].Index];
+            } catch { }
+        }
     }
 }

@@ -55,6 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Gui\ActionItem.cs" />
     <Compile Include="Gui\EPlexItemTypes.cs" />
     <Compile Include="Gui\FormPlexClientMain.cs">
       <SubType>Form</SubType>
@@ -62,15 +63,10 @@
     <Compile Include="Gui\FormPlexClientMain.Designer.cs">
       <DependentUpon>FormPlexClientMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="Gui\IPLexItemBase.cs" />
-    <Compile Include="Gui\IPlexItemFolder.cs" />
-    <Compile Include="Gui\ListItemBase.cs" />
     <Compile Include="Gui\IMenuItem.cs" />
-    <Compile Include="Gui\ConfigurationItem.cs" />
+    <Compile Include="Gui\MenuItem.cs" />
     <Compile Include="Gui\MenuNavigation.cs" />
-    <Compile Include="Gui\PlexItemBase.cs" />
-    <Compile Include="Gui\PlexItemFolder.cs" />
-    <Compile Include="Gui\PlexItemVideo.cs" />
+    <Compile Include="Gui\PlexMenuItem.cs" />
     <Compile Include="Plex\PlexServer.cs" />
     <Compile Include="Plex\Xml\PlexWebProtocol.cs">
       <DependentUpon>PlexWebProtocol.xsd</DependentUpon>
@@ -83,7 +79,6 @@
     <Compile Include="PlexMediaClientProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Plex\PlexInterface.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="Util\ArtWorkRetrieval.cs" />
     <Compile Include="Util\BonjourDiscovery.cs" />
     <Compile Include="Util\Encryption.cs" />
@@ -156,7 +151,6 @@
     <None Include="Resources\plex.iTunesArtwork.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Lib\dnssd.dll" />
     <Content Include="Lib\ZeroconfService.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
