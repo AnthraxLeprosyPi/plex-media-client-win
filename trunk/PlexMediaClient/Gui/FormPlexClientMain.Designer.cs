@@ -27,33 +27,14 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.splitContainerInner = new System.Windows.Forms.SplitContainer();
             this.MenuPane = new System.Windows.Forms.DataGridView();
-            this.iMenuItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.iconDataGridViewImageColumn = new System.Windows.Forms.DataGridViewImageColumn();
             this.titleDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainerInner)).BeginInit();
-            this.splitContainerInner.Panel1.SuspendLayout();
-            this.splitContainerInner.SuspendLayout();
+            this.iMenuItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.MenuPane)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).BeginInit();
             this.SuspendLayout();
-            // 
-            // splitContainerInner
-            // 
-            this.splitContainerInner.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainerInner.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainerInner.IsSplitterFixed = true;
-            this.splitContainerInner.Location = new System.Drawing.Point(0, 0);
-            this.splitContainerInner.Name = "splitContainerInner";
-            // 
-            // splitContainerInner.Panel1
-            // 
-            this.splitContainerInner.Panel1.Controls.Add(this.MenuPane);
-            this.splitContainerInner.Panel2Collapsed = true;
-            this.splitContainerInner.Size = new System.Drawing.Size(300, 768);
-            this.splitContainerInner.SplitterDistance = 275;
-            this.splitContainerInner.TabIndex = 5;
             // 
             // MenuPane
             // 
@@ -83,7 +64,7 @@
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.DarkOrange;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.MenuPane.DefaultCellStyle = dataGridViewCellStyle3;
-            this.MenuPane.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MenuPane.Dock = System.Windows.Forms.DockStyle.Left;
             this.MenuPane.GridColor = System.Drawing.Color.Black;
             this.MenuPane.Location = new System.Drawing.Point(0, 0);
             this.MenuPane.MultiSelect = false;
@@ -98,10 +79,6 @@
             this.MenuPane.TabIndex = 4;
             this.MenuPane.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.menuPane_CellDoubleClick);
             this.MenuPane.SelectionChanged += new System.EventHandler(this.menuPane_SelectionChanged);
-            // 
-            // iMenuItemBindingSource
-            // 
-            this.iMenuItemBindingSource.DataSource = typeof(PlexMediaClient.Gui.IMenuItem);
             // 
             // iconDataGridViewImageColumn
             // 
@@ -126,24 +103,39 @@
             this.titleDataGridViewTextBoxColumn.Name = "titleDataGridViewTextBoxColumn";
             this.titleDataGridViewTextBoxColumn.ReadOnly = true;
             // 
+            // iMenuItemBindingSource
+            // 
+            this.iMenuItemBindingSource.DataSource = typeof(PlexMediaClient.Gui.IMenuItem);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(300, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 59.89583F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40.10417F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(724, 768);
+            this.tableLayoutPanel1.TabIndex = 5;
+            // 
             // FormPlexClientMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
+            this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(300, 768);
-            this.Controls.Add(this.splitContainerInner);
+            this.ClientSize = new System.Drawing.Size(1024, 768);
+            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.MenuPane);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.MinimumSize = new System.Drawing.Size(300, 766);
+            this.MinimumSize = new System.Drawing.Size(300, 34);
             this.Name = "FormPlexClientMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Form1";
-            this.SizeChanged += new System.EventHandler(this.FormPlexClientMain_SizeChanged);
-            this.splitContainerInner.Panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainerInner)).EndInit();
-            this.splitContainerInner.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.MenuPane)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).EndInit();
             this.ResumeLayout(false);
@@ -152,11 +144,11 @@
 
         #endregion
 
-        private System.Windows.Forms.SplitContainer splitContainerInner;
-        private System.Windows.Forms.DataGridView MenuPane;
         private System.Windows.Forms.BindingSource iMenuItemBindingSource;
-        private System.Windows.Forms.DataGridViewImageColumn iconDataGridViewImageColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn titleDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewImageColumn iconDataGridViewImageColumn;
+        private System.Windows.Forms.DataGridView MenuPane;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 
     }
 }

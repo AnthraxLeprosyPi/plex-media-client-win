@@ -32,7 +32,7 @@ namespace PlexMediaClient.Gui {
             MenuNavigation.OnClose += new MenuNavigation.OnCloseEventHandler(MenuNavigation_OnClose);
             MenuNavigation.OnMenuItemsFetched += new MenuNavigation.OnMenuItemsFetchedEventHandler(Navigation_OnItemsFetched);
             MenuNavigation.OnErrorOccured += new MenuNavigation.OnErrorOccuredEventHandler(Navigation_OnErrorOccured);
-            ArtWorkRetrieval.OnArtWorkRetrieved += new ArtWorkRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);
+            ArtWorkRetrieval.OnArtWorkRetrieved += new ArtWorkRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);            
         }
 
         void MenuNavigation_OnClose(string reason) {
@@ -62,13 +62,16 @@ namespace PlexMediaClient.Gui {
 
         protected override void OnLoad(EventArgs e) {
             //Cursor = Cursors.WaitCursor;                     
-            this.Size = new Size(this.Size.Width, Screen.PrimaryScreen.WorkingArea.Height);
+
             // ServerManager.Instance.ToString();
             //PlexInterface.Login();
+            Rectangle workingArea = Screen.GetWorkingArea(this);
+            workingArea.Width = 300;
+            Bounds = workingArea;
             if (PlexInterface.TryConnectLastServer()) {
                 MenuNavigation.ShowMenuRoot();
             } else if (PlexInterface.PlexServersAvailable) {
-                MenuNavigation.ShowMenuServerSelection();
+                //MenuNavigation.ShowMenuServerSelection();
             } else if (ShowErrorMessage("Unable to start PlexMediaCenter - Please check network connection...") == DialogResult.Retry) {
                 ServerManager.Instance.RefrehBonjourServers();
                 Thread.Sleep(500);
@@ -100,7 +103,7 @@ namespace PlexMediaClient.Gui {
                 case Keys.Up:
                 case Keys.Down:
                     if (!MenuPane.Focused) {
-                        MenuPane.Select();                        
+                        MenuPane.Select();
                     }
                     return base.ProcessCmdKey(ref msg, keyData);
                 case Keys.Enter:
@@ -116,46 +119,39 @@ namespace PlexMediaClient.Gui {
                 case Keys.Back:
                 case Keys.BrowserBack:
                 case Keys.Escape:
-                    MenuNavigation.FetchPreviousMenu();
+                    MenuNavigation.FetchPreviousMenu(SelectedMenuItem.Parent);
                     break;
                 case Keys.Alt | Keys.F4:
                     this.Close();
                     break;
-                case Keys.F11:
-                    ToggleFullScreen();
+                case Keys.Right:
+                    Expand();
                     break;
+                case Keys.Left:
+                    Shrink();
+                    break;          
                 default:
                     break;
             }
             return true;
         }
 
-
-        private void ToggleFullScreen() {
-            switch (WindowState) {
-                case FormWindowState.Maximized:
-                    WindowState = FormWindowState.Normal;
-                    break;
-                case FormWindowState.Minimized:
-                case FormWindowState.Normal:
-                default:
-                    WindowState = FormWindowState.Maximized;
-                    break;
-            }
+       
+        private void Shrink() {           
+            Rectangle rec = Screen.GetWorkingArea(this);
+            while (rec.Width > 300) {
+                rec.Width -= 5;
+                Bounds = rec;          
+            }             
         }
 
-        private void FormPlexClientMain_SizeChanged(object sender, EventArgs e) {
-            switch (WindowState) {
-                case FormWindowState.Maximized:
-                    splitContainerInner.Panel2Collapsed = false;
-                    break;
-                case FormWindowState.Minimized:
-                case FormWindowState.Normal:
-                default:
-                    splitContainerInner.Panel2Collapsed = true;
-                    break;
-            }
-
+        private void Expand() {
+            int maxWidth = Screen.GetWorkingArea(this).Width;
+            Rectangle bounds = Bounds;
+            while (bounds.Width < maxWidth) {
+                bounds.Width += 5;
+                Bounds = bounds;
+            }            
         }
 
         private void menuPane_SelectionChanged(object sender, EventArgs e) {
