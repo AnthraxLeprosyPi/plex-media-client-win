@@ -66,8 +66,7 @@
     <Compile Include="Gui\IMenuItem.cs" />
     <Compile Include="Gui\MenuItem.cs" />
     <Compile Include="Gui\MenuNavigation.cs" />
-    <Compile Include="Gui\PlexMenuItem.cs" />
-    <Compile Include="Gui\ServerItem.cs" />
+    <Compile Include="Gui\PlexItem.cs" />
     <Compile Include="Plex\PlexServer.cs" />
     <Compile Include="Plex\Xml\PlexWebProtocol.cs">
       <DependentUpon>PlexWebProtocol.xsd</DependentUpon>

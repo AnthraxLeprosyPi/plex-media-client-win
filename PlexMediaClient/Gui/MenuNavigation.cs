@@ -7,7 +7,6 @@ using PlexMediaClient.Plex;
 namespace PlexMediaClient.Gui {
     public static class MenuNavigation {
 
-        private static Stack<IMenuItem> History { get; set; }
         public static bool IsFetching { get; set; }
 
         public static event OnCloseEventHandler OnClose;
@@ -17,80 +16,76 @@ namespace PlexMediaClient.Gui {
         public static event OnMenuItemsFetchedEventHandler OnMenuItemsFetched;
         public delegate void OnMenuItemsFetchedEventHandler(List<IMenuItem> fetchedMenuItems);
 
-        static MenuItem RootItem { get; set; }        
-        static ActionItem BackItem { get; set; }
-        static ActionItem ServerItem { get; set; }
-        static ActionItem ExitItem { get; set; }
+        static MenuItem RootItem { get; set; }
+        static MenuItem ServerItem { get; set; }
+        static List<IMenuItem> ServerMenu { get; set; }
+
 
         static MenuNavigation() {
-            History = new Stack<IMenuItem>();
-            CreateStaticMenuItems();
+            RootItem = new MenuItem(null, "Root Item");
+            ServerItem = new MenuItem(RootItem, "Plex Servers");
+            ServerMenu = new List<IMenuItem>();
             PlexInterface.OnPlexError += new PlexInterface.OnPlexErrorEventHandler(PlexInterface_OnPlexError);
             PlexInterface.OnPlexConnected += new PlexInterface.OnPlexConnectedEventHandler(PlexInterface_OnPlexConnected);
             ServerManager.OnPlexServersChanged += new ServerManager.OnPlexServersChangedEventHandler(ServerManager_OnPlexServersChanged);
         }
-
-        private static void CreateStaticMenuItems() {
-            RootItem = new MenuItem("Root Item");
-            ServerItem = new ActionItem("Plex Servers", Properties.Resources.icon_server_bonjour, () => ShowMenuServerSelection());
-            RootItem.SubMenu.Add(ServerItem);
-            ExitItem = new ActionItem("Exit", Properties.Resources.icon_server_offline, () => OnClose("User exited..."));
-            RootItem.SubMenu.Add(ExitItem);
-            BackItem = new ActionItem("Back...", Properties.Resources.icon_server_online, () => MenuNavigation.FetchPreviousMenu());
-        }
-
-
 
         static void PlexInterface_OnPlexError(Exception e) {
             OnErrorOccured(e);
         }
 
         static void PlexInterface_OnPlexConnected(MediaContainer plexSections) {
-            BuildSubMenu(GetCreatePlexMenuItem(plexSections));
+            //ShowCurrentMenu(GetCreatePlexMenuItem(plexSections));
         }
 
-        internal static void FetchPreviousMenu() {
-            if (History != null && History.Count > 1) {
-                History.Pop();
-                OnMenuItemsFetched(History.Peek().SubMenu);
+        internal static void FetchPreviousMenu(IMenuItem currentItem) {
+            if (currentItem != null && currentItem.Parent != null) {
+                ShowCurrentMenu(currentItem.Parent);
             }
         }
 
-        internal static void BuildSubMenu(IMenuItem parentItem) {
-            History.Push(parentItem);
+        internal static void ShowCurrentMenu(IMenuItem parentItem) {
             //if (parentItem is PlexMenuItem) {
             //    OnMenuItemsFetched(FetchSubMenu(parentItem));
             //} else 
-                if (parentItem.SubMenu.Count > 0) {
-                OnMenuItemsFetched(parentItem.SubMenu);
+            if (parentItem.ChildItems.Count > 0) {
+                OnMenuItemsFetched(parentItem.ChildItems);
             } else {
                 return;
             }
 
         }
 
-        private static List<IMenuItem> FetchSubMenu(IMenuItem parentItem) {
+        private static List<IMenuItem> FetchSubMenu(PlexItem parentItem) {
             IsFetching = true;
-            parentItem.SubMenu = GetSubMenuItems(PlexInterface.RequestPlexItems(parentItem.Path));
-            parentItem.SubMenu.Add(BackItem);
+            parentItem.SetChildItems(GetSubMenuItems(parentItem, PlexInterface.RequestPlexItems(parentItem.Path)));
             IsFetching = false;
-            return parentItem.SubMenu;
+            return parentItem.ChildItems;
         }
 
-        private static IMenuItem GetCreatePlexMenuItem(MediaContainer plexResponseConatiner) {
-            PlexMenuItem newMenuItem = new PlexMenuItem(plexResponseConatiner.title1, plexResponseConatiner.UriSource);
-            newMenuItem.SubMenu = GetSubMenuItems(plexResponseConatiner);
-            newMenuItem.SubMenu.Add(BackItem);
-            return newMenuItem;
-        }
+        //private static IMenuItem GetCreatePlexMenuItem(MediaContainer plexResponseConatiner) {
+        //    PlexItem newMenuItem = new PlexItem(plexResponseConatiner.title1, plexResponseConatiner.UriSource);
+        //    newMenuItem.ChildItems = GetSubMenuItems(newMenuItem, plexResponseConatiner);            
+        //    return newMenuItem;
+        //}
 
-        private static List<IMenuItem> GetSubMenuItems(MediaContainer plexResponseConatiner) {
+        public static List<IMenuItem> GetSubMenuItems(IMenuItem parentItem, MediaContainer plexResponseConatiner) {
             //Add ActionItems
-            return plexResponseConatiner.Directory.ConvertAll<IMenuItem>(dir => new PlexMenuItem());
+            return plexResponseConatiner.Directory.ConvertAll<IMenuItem>(dir => new PlexItem(parentItem, "", new Uri("")));
         }
 
         internal static void ShowMenuRoot() {
-            BuildSubMenu(RootItem);
+
+
+            ServerMenu.Add(new MenuItem(ServerItem, "Test"));
+            ServerMenu.Add(new MenuItem(ServerItem, "Test"));
+            ServerMenu.Add(new MenuItem(ServerItem, "Test"));
+            ServerMenu.Add(new MenuItem(ServerItem, "Test"));
+            ServerMenu.Add(new MenuItem(ServerItem, "Test"));
+            ServerMenu.Add(new MenuItem(ServerItem, "Test"));
+            ServerItem.SetChildItems(ServerMenu);
+            RootItem.SetChildItems(new List<IMenuItem>() { ServerItem });
+            ShowCurrentMenu(RootItem);
         }
 
         internal static void ShowMenuServerSections() {
@@ -107,25 +102,19 @@ namespace PlexMediaClient.Gui {
             //BuildSubMenu(main);
         }
 
-        static List<IMenuItem> ServerMenu { get; set; }
 
-        static void ServerManager_OnPlexServersChanged(List<PlexServer> updatedServerList) {            
+
+        static void ServerManager_OnPlexServersChanged(List<PlexServer> updatedServerList) {
             ServerMenu = new List<IMenuItem>();
-            ServerMenu.AddRange(updatedServerList.ConvertAll<ServerItem>(svr => new ServerItem(svr)));
-            ServerMenu.Add(new ActionItem("Refresh Bonjour", Properties.Resources.icon_server_bonjour, () => RefreshBonjourServers()));
-            ServerMenu.Add(BackItem);
-            ServerItem.SubMenu = ServerMenu;            
+            ServerMenu.AddRange(updatedServerList.ConvertAll<MenuItem>(svr => new MenuItem(ServerItem, svr.HostAdress)));
         }
 
-         static void RefreshBonjourServers() {
-             OnMenuItemsFetched(ServerMenu);
-             ServerManager.Instance.RefrehBonjourServers();
+        static void RefreshBonjourServers() {
+            ServerManager.Instance.RefrehBonjourServers();
         }
 
-        internal static void ShowMenuServerSelection() {
-           BuildSubMenu(ServerItem);
+        internal static void ExitApplication(string reason) {
+            OnClose(reason);
         }
-
-        
     }
 }

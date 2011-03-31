@@ -6,11 +6,10 @@ using System.Drawing;
 
 namespace PlexMediaClient.Gui {
     public interface IMenuItem {
+        IMenuItem Parent { get; set; }       
         String Title { get; set; }
-        Image Icon { get; }
-        Uri Path { get; set; } 
-        List<IMenuItem> SubMenu { get; set; }
-
+        Image Icon { get; }        
+        List<IMenuItem> ChildItems { get;}
         void OnClicked(object sender, EventArgs e);
     }
 }

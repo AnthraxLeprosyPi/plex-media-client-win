@@ -10,8 +10,8 @@ namespace PlexMediaClient.Gui {
         Image SpecialIcon { get; set; }
         Action Action { get; set; }
 
-        public ActionItem(string title, Image specialIcon, Action actionDelegate)
-            : base(title) {
+        public ActionItem(IMenuItem parentItem,string title, Image specialIcon, Action actionDelegate)
+            : base(parentItem, title) {
             Action = actionDelegate;
             SpecialIcon = specialIcon;
         }
