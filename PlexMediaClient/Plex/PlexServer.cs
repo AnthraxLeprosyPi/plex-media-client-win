@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using PlexMediaClient.Util;
 using System.Xml.Serialization;
+using System.Net;
 
 namespace PlexMediaClient.Plex {
     [Serializable]
@@ -48,6 +49,18 @@ namespace PlexMediaClient.Plex {
 
         public bool Equals(PlexServer other) {
             return HostAdress.Equals(other.HostAdress);
+        }
+
+        public bool Authenticate(ref WebClient webClient) {
+            webClient.Headers["X-Plex-User"] = this.UserName;
+            webClient.Headers["X-Plex-Pass"] = this.UserPass;
+            try {
+                return !String.IsNullOrEmpty(webClient.DownloadString(this.UriPlexBase));
+            } catch (Exception e) {
+                //Log
+                return false;
+            }
+
         }
     }
 }

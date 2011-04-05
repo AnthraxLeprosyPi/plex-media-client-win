@@ -21,8 +21,10 @@ namespace PlexMediaClient.Util {
 
         ServerManager() {
             PlexServers = LoadPlexServers();
-            BonjourDiscovery.OnBonjourServer += new BonjourDiscovery.OnBonjourServerEventHandler(BonjourDiscovery_OnBonjourServer);
-            BonjourDiscovery.StartBonjourDiscovery();
+            if (!String.IsNullOrEmpty(Properties.Settings.Default.LastServer.HostAdress)) {
+                PlexServerCurrent = Properties.Settings.Default.LastServer;
+            }
+            BonjourDiscovery.OnBonjourServer += new BonjourDiscovery.OnBonjourServerEventHandler(BonjourDiscovery_OnBonjourServer);            
         }
 
         ~ServerManager() {
@@ -31,13 +33,27 @@ namespace PlexMediaClient.Util {
         public static ServerManager Instance { get { return instance; } }
 
         public List<PlexServer> PlexServers { get; private set; }
-        public PlexServer PlexServerCurrent { get; private set; }
+
+        private PlexServer _plexServerCurrent;
+        public PlexServer PlexServerCurrent {
+            get {
+                return _plexServerCurrent;
+            }
+            private set {
+                _plexServerCurrent = value;
+                if (!PlexServers.Contains(value)) {
+                    PlexServers.Insert(0, value);
+                }
+                SavePlexServers(PlexServers);
+               
+            }
+        }
 
         private List<PlexServer> LoadPlexServers() {
             List<PlexServer> plexServers = new List<PlexServer>();
             if (File.Exists("PlexServers.xml")) {
                 try {
-                    plexServers = XmlSerialization.DeSerialize<List<PlexServer>>("PlexServers.xml");
+                    plexServers = XmlSerialization.DeSerialize<List<PlexServer>>("PlexServers.xml");                    
                 } catch {
                     //ToDo Log
                 }
@@ -46,6 +62,8 @@ namespace PlexMediaClient.Util {
         }
 
         private void SavePlexServers(List<PlexServer> plexServers) {
+            Properties.Settings.Default.LastServer = PlexServerCurrent;
+            Properties.Settings.Default.Save();
             if (plexServers == null) {
                 return;
             }
@@ -59,8 +77,7 @@ namespace PlexMediaClient.Util {
 
 
         public void SetPlexServer(PlexServer server) {
-            Properties.Settings.Default.LastServer = server;
-            Properties.Settings.Default.Save();
+           
             //Login(server);
         }
 
@@ -73,8 +90,19 @@ namespace PlexMediaClient.Util {
 
         public void RefrehBonjourServers() {
             PlexServers.RemoveAll(svr => svr.IsBonjour);
-            OnPlexServersChanged(PlexServers);
+            if (PlexServers.Count > 0) {
+                OnPlexServersChanged(PlexServers);
+            }
             BonjourDiscovery.RefreshBonjourDiscovery();
+        }               
+
+        internal bool Authenticate(ref System.Net.WebClient _webClient, PlexServer plexServer) {
+            if (plexServer.Authenticate(ref _webClient)) {
+                PlexServerCurrent = plexServer;
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }

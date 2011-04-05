@@ -1,17 +1,12 @@
 ﻿
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 using System;
-using PlexMediaClient.Util;
-using PlexMediaClient.Gui;
-using PlexMediaClient.Plex.Xml;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Threading;
+using System.Windows.Forms;
 using PlexMediaClient.Plex;
+using PlexMediaClient.Util;
+
 
 namespace PlexMediaClient.Gui {
     public partial class FormPlexClientMain : Form {
@@ -60,27 +55,19 @@ namespace PlexMediaClient.Gui {
             this.Invoke(new MethodInvoker(delegate() { iMenuItemBindingSource.DataSource = fetchedItems; iMenuItemBindingSource.ResetBindings(false); }));
         }
 
-        protected override void OnLoad(EventArgs e) {
-            //Cursor = Cursors.WaitCursor;                     
-
-            // ServerManager.Instance.ToString();
-            //PlexInterface.Login();
+        protected override void OnLoad(EventArgs e) {            
             Rectangle workingArea = Screen.GetWorkingArea(this);
             workingArea.Width = 300;
             Bounds = workingArea;
-            if (PlexInterface.TryConnectLastServer()) {
-                MenuNavigation.ShowMenuRoot();
-            } else if (PlexInterface.PlexServersAvailable) {
-                //MenuNavigation.ShowMenuServerSelection();
-            } else if (ShowErrorMessage("Unable to start PlexMediaCenter - Please check network connection...") == DialogResult.Retry) {
-                ServerManager.Instance.RefrehBonjourServers();
+            if (MenuNavigation.CreateStartupMenu()){
+                base.OnLoad(e);
+            }else if(ShowErrorMessage("Unable to start PlexMediaCenter - Please check network connection...") == DialogResult.Retry) {
+                MenuNavigation.RefreshServerMenu();
                 Thread.Sleep(500);
                 OnLoad(e);
             } else {
                 this.Close();
-            }
-
-            base.OnLoad(e);
+            }            
         }
 
         private DialogResult ShowErrorMessage(string errorMessage) {

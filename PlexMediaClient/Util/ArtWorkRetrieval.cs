@@ -56,6 +56,10 @@ namespace PlexMediaClient.Util {
         }
 
         static void ArtWorkRetriever_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e) {
+            if (e.Error != null) {
+                //ToDo handle
+                return;
+            }
             if (e.Result != null) {
                 if (e.UserState is string) {
                     string artWorkIndex = (string)e.UserState;
