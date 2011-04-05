@@ -56,6 +56,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gui\ActionItem.cs" />
+    <Compile Include="Gui\DialogNewPlexServer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gui\DialogNewPlexServer.Designer.cs">
+      <DependentUpon>DialogNewPlexServer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Gui\EPlexItemTypes.cs" />
     <Compile Include="Gui\FormPlexClientMain.cs">
       <SubType>Form</SubType>
@@ -84,6 +90,9 @@
     <Compile Include="Util\Encryption.cs" />
     <Compile Include="Util\ServerManager.cs" />
     <Compile Include="Util\XmlSerialization.cs" />
+    <EmbeddedResource Include="Gui\DialogNewPlexServer.resx">
+      <DependentUpon>DialogNewPlexServer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Gui\FormPlexClientMain.resx">
       <DependentUpon>FormPlexClientMain.cs</DependentUpon>
     </EmbeddedResource>

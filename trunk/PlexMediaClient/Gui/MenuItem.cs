@@ -5,25 +5,25 @@ using System.Text;
 using PlexMediaClient.Util;
 
 namespace PlexMediaClient.Gui {
-   public class MenuItem : IMenuItem {
+    public class MenuItem : IMenuItem {
 
         public MenuItem(IMenuItem parent, string title) {
             Parent = parent;
             Title = title;
         }
 
-        public IMenuItem Parent { get; set; }       
+        public IMenuItem Parent { get; set; }
         public string Title { get; set; }
         public List<IMenuItem> ChildItems { get; set; }
 
         public virtual System.Drawing.Image Icon {
-            get { return ArtWorkRetrieval.GetArtWork(Title); }
-        }      
-       
+            get { return Properties.Resources.icon_empty_artwork; }//return ArtWorkRetrieval.GetArtWork(Title); }
+        }
+
         public virtual void OnClicked(object sender, EventArgs e) {
             if (ChildItems != null && ChildItems.Count > 0) {
                 MenuNavigation.ShowCurrentMenu(this);
-            } 
+            }
         }
 
         public List<IMenuItem> GetChildItems() {
@@ -33,11 +33,9 @@ namespace PlexMediaClient.Gui {
             childItems.ForEach(ch => ch.Parent = this);
             if (Parent != null) {
                 childItems.Add(new ActionItem(Parent, "Back", Properties.Resources.icon_server_bonjour, () => MenuNavigation.FetchPreviousMenu(this)));
-            } else { 
-                childItems.Add(new ActionItem(null, "Exit", Properties.Resources.icon_server_offline, () => MenuNavigation.ExitApplication("User exited...")));
             }
             ChildItems = childItems;
         }
 
-   }
+    }
 }
