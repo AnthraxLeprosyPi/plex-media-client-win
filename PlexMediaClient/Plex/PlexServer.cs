@@ -51,6 +51,11 @@ namespace PlexMediaClient.Plex {
             return HostAdress.Equals(other.HostAdress);
         }
 
+        public void AddAuthHeaders(ref WebClient webClient) {
+            webClient.Headers["X-Plex-User"] = this.UserName;
+            webClient.Headers["X-Plex-Pass"] = this.UserPass;         
+        }
+
         public bool Authenticate(ref WebClient webClient) {
             webClient.Headers["X-Plex-User"] = this.UserName;
             webClient.Headers["X-Plex-Pass"] = this.UserPass;

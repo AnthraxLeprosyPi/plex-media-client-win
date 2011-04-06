@@ -25,7 +25,7 @@ namespace PlexMediaClient.Gui {
 
 
         static MenuNavigation() {
-            PlexInterface.OnPlexError += new PlexInterface.OnPlexErrorEventHandler(PlexInterface_OnPlexError);
+            PlexInterface.OnPlexError += new PlexInterface.OnPlexErrorEventHandler(PlexInterface_OnPlexError);           
             ServerManager.OnPlexServersChanged += new ServerManager.OnPlexServersChangedEventHandler(ServerManager_OnPlexServersChanged);
             RootItem = new PlexItem(null, "Root Item", null);
             ExitItem = new ActionItem(null, "Exit", Properties.Resources.icon_server_offline, () => MenuNavigation.OnClose("User exited..."));
@@ -34,8 +34,8 @@ namespace PlexMediaClient.Gui {
             RootMenu.Add(ServerItem);
             RootMenu.Add(ExitItem);
             RootItem.SetChildItems(RootMenu);
-        }
-
+        }        
+             
         static void PlexInterface_OnPlexError(Exception e) {
             OnErrorOccured(e);
         }
@@ -50,8 +50,9 @@ namespace PlexMediaClient.Gui {
         }
 
         static void ServerManager_OnPlexServersChanged(List<PlexServer> updatedServerList) {
-            ServerMenu = updatedServerList.ConvertAll<IMenuItem>(svr => new MenuItem(ServerItem, svr.HostAdress));
-            ServerMenu.Add(new ActionItem(null, "Refresh Bonjour", Properties.Resources.icon_server_bonjour, () => PlexInterface.RefreshBonjourServers()));
+            ServerMenu = updatedServerList.ConvertAll<IMenuItem>(svr => new ActionItem(ServerItem, svr.HostAdress, Properties.Resources.icon_server_offline, () => ShowRootMenu(PlexInterface.TryGetPlexSections(svr))));
+            ServerMenu.Add(new ActionItem(null, "Add New...", Properties.Resources.icon_server_online, () => AddNewServer()));
+            ServerMenu.Add(new ActionItem(null, "Refresh Bonjouor...", Properties.Resources.icon_server_bonjour, () => PlexInterface.RefreshBonjourServers()));
             ServerItem.SetChildItems(ServerMenu);
             if (CurrentItem == ServerItem) {
                 ShowCurrentMenu(ServerItem);
@@ -60,17 +61,32 @@ namespace PlexMediaClient.Gui {
 
         internal static bool CreateStartupMenu() {
             RefreshServerMenu();
-            ShowRootMenu(PlexInterface.TryConnectLastServer());
+            try {
+                ShowRootMenu(PlexInterface.TryGetPlexSections());
+            } catch (Exception e) {
+                if (PlexInterface.PlexServersAvailable) {
+                    ShowCurrentMenu(ServerItem);
+                } else {
+                    return AddNewServer();
+                }
+            }
             return true;
         }
 
-        private static bool ShowNewServerDialog() {
+        private static bool AddNewServer() {
+            try {
+                ShowRootMenu(PlexInterface.TryGetPlexSections(ShowNewServerDialog()));
+                RefreshServerMenu();
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        private static PlexServer ShowNewServerDialog() {
             using (DialogNewPlexServer dlgServer = new DialogNewPlexServer()) {
-                bool success = dlgServer.ShowDialog() == System.Windows.Forms.DialogResult.OK;
-                if (success) {
-                    PlexInterface.TryGetPlexSections(dlgServer.NewServer);
-                }
-                return success;
+                dlgServer.ShowDialog();
+                return dlgServer.NewServer;
             }
         }
 
@@ -91,7 +107,10 @@ namespace PlexMediaClient.Gui {
 
         internal static List<IMenuItem> GetSubMenuItems(PlexItem parentItem, MediaContainer plexResponseConatiner) {
             //Add ActionItems
-            return plexResponseConatiner.Directory.ConvertAll<IMenuItem>(dir => new PlexItem(parentItem, dir.title, new Uri(parentItem.Path, dir.key)));
+            List<IMenuItem> tmpList = new List<IMenuItem>();
+            tmpList.AddRange(plexResponseConatiner.Directory.ConvertAll<IMenuItem>(dir => new PlexItemDirectory(parentItem, dir.title, new Uri(parentItem.Path, dir.key), dir)));
+            tmpList.AddRange(plexResponseConatiner.Video.ConvertAll<IMenuItem>(vid => new PlexItem(parentItem, vid.title, new Uri(parentItem.Path, vid.key))));
+            return tmpList;
         }
 
         internal static void RefreshServerMenu() {

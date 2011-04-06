@@ -29,6 +29,7 @@ namespace PlexMediaClient.Gui {
 
         private void buttonCancel_Click(object sender, EventArgs e) {
             DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            NewServer = null;
             this.Close();
         }
 

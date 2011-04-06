@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace PlexMediaClient.Gui {
     public interface IMenuItem {
-        IMenuItem Parent { get; set; }       
+        IMenuItem Parent { get; set; }
+        Uri Path { get; set; }
         String Title { get; set; }
         Image Icon { get; }        
         List<IMenuItem> ChildItems { get;}
         void OnClicked(object sender, EventArgs e);
+        void OnPaint(object sender, DataGridViewCellPaintingEventArgs e);
+        void OnSelected();
     }
 }

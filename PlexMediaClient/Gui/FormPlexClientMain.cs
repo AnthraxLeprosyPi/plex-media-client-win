@@ -27,7 +27,7 @@ namespace PlexMediaClient.Gui {
             MenuNavigation.OnClose += new MenuNavigation.OnCloseEventHandler(MenuNavigation_OnClose);
             MenuNavigation.OnMenuItemsFetched += new MenuNavigation.OnMenuItemsFetchedEventHandler(Navigation_OnItemsFetched);
             MenuNavigation.OnErrorOccured += new MenuNavigation.OnErrorOccuredEventHandler(Navigation_OnErrorOccured);
-            ArtWorkRetrieval.OnArtWorkRetrieved += new ArtWorkRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);            
+            ArtWorkRetrieval.OnArtWorkRetrieved += new ArtWorkRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);          
         }
 
         void MenuNavigation_OnClose(string reason) {
@@ -144,7 +144,14 @@ namespace PlexMediaClient.Gui {
         private void menuPane_SelectionChanged(object sender, EventArgs e) {
             try {
                 SelectedMenuItem = ((List<IMenuItem>)iMenuItemBindingSource.DataSource)[MenuPane.SelectedRows[0].Index];
+                SelectedMenuItem.OnSelected();
             } catch { }
+        }
+
+        private void MenuPane_CellPainting(object sender, DataGridViewCellPaintingEventArgs e) {
+            if (e.ColumnIndex == titleDataGridViewTextBoxColumn.Index) {
+                ((List<IMenuItem>)iMenuItemBindingSource.DataSource)[e.RowIndex].OnPaint(sender, e);
+            }
         }
     }
 }

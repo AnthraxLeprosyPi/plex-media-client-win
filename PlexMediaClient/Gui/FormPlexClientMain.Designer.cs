@@ -78,6 +78,7 @@
             this.MenuPane.Size = new System.Drawing.Size(300, 768);
             this.MenuPane.TabIndex = 4;
             this.MenuPane.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.menuPane_CellDoubleClick);
+            this.MenuPane.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.MenuPane_CellPainting);
             this.MenuPane.SelectionChanged += new System.EventHandler(this.menuPane_SelectionChanged);
             // 
             // iconDataGridViewImageColumn

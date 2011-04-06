@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using PlexMediaClient.Util;
+using System.Windows.Forms;
 
 namespace PlexMediaClient.Gui {
     public class MenuItem : IMenuItem {
@@ -13,11 +13,12 @@ namespace PlexMediaClient.Gui {
         }
 
         public IMenuItem Parent { get; set; }
+        public Uri Path { get; set; }
         public string Title { get; set; }
         public List<IMenuItem> ChildItems { get; set; }
 
         public virtual System.Drawing.Image Icon {
-            get { return Properties.Resources.icon_empty_artwork; }//return ArtWorkRetrieval.GetArtWork(Title); }
+            get { return Properties.Resources.icon_empty_artwork; }
         }
 
         public virtual void OnClicked(object sender, EventArgs e) {
@@ -37,5 +38,13 @@ namespace PlexMediaClient.Gui {
             ChildItems = childItems;
         }
 
+        public virtual void OnPaint(object sender, DataGridViewCellPaintingEventArgs e) {
+            e.Paint(e.ClipBounds, e.PaintParts);
+        }
+             
+        public virtual void OnSelected() {
+            return;
+        }
+       
     }
 }

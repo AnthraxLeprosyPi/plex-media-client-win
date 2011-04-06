@@ -28,11 +28,6 @@ namespace PlexMediaClient.Util {
             }
         }
 
-
-        static void DownloadArt(MediaContainer theContainer) {
-
-        }
-
         internal static Image GetArtWork(string imageIndex) {
             if (String.IsNullOrEmpty(imageIndex)) {
                 return Properties.Resources.icon_empty_artwork;
@@ -48,11 +43,15 @@ namespace PlexMediaClient.Util {
         }
 
         internal static void DownloadImage(string imageIndex) {
-            WebClient ArtWorkRetriever = new WebClient();
-            ArtWorkRetriever.Headers["X-Plex-User"] = ServerManager.Instance.PlexServerCurrent.UserName;
-            ArtWorkRetriever.Headers["X-Plex-Pass"] = ServerManager.Instance.PlexServerCurrent.UserPass;
+            WebClient ArtWorkRetriever = new WebClient();            
+            ServerManager.Instance.PlexServerCurrent.AddAuthHeaders(ref ArtWorkRetriever);            
             ArtWorkRetriever.DownloadDataCompleted += new DownloadDataCompletedEventHandler(ArtWorkRetriever_DownloadDataCompleted);
+            ArtWorkRetriever.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ArtWorkRetriever_DownloadProgressChanged);
             ArtWorkRetriever.DownloadDataAsync(new Uri(ServerManager.Instance.PlexServerCurrent.UriPlexBase, imageIndex), imageIndex);
+        }
+
+        static void ArtWorkRetriever_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
+            //throw new NotImplementedException();
         }
 
         static void ArtWorkRetriever_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e) {
