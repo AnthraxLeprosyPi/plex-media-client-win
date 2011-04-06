@@ -80,6 +80,7 @@ namespace PlexMediaClient.Gui {
             if (PlexInterface.IsBusy) {
                 return;
             }
+            menuPane_SelectionChanged(sender, e) ;
             SelectedMenuItem.OnClicked(sender, e);
 
             //MenuNavigation.FetchItems(((List<ListItem>)listItemBindingSource.DataSource)[e.RowIndex]);

@@ -39,7 +39,7 @@ namespace PlexMediaClient.Gui {
         }
 
         public virtual void OnPaint(object sender, DataGridViewCellPaintingEventArgs e) {
-            e.Paint(e.ClipBounds, e.PaintParts);
+           // e.Paint(e.ClipBounds, e.PaintParts);
         }
              
         public virtual void OnSelected() {

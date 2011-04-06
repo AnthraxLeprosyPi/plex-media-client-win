@@ -67,7 +67,7 @@ namespace PlexMediaClient.Util {
                 return;
             }
             try {
-                XmlSerialization.Serialize("PlexServers.xml", plexServers.Where(ser => !ser.IsBonjour).ToList());
+                XmlSerialization.Serialize("PlexServers.xml", plexServers);
             } catch {
                 //ToDo Log
             }
@@ -86,8 +86,7 @@ namespace PlexMediaClient.Util {
             }
         }
 
-        public void RefrehBonjourServers() {
-            PlexServers.RemoveAll(svr => svr.IsBonjour);
+        public void RefrehBonjourServers() {            
             if (PlexServers.Count > 0) {
                 OnPlexServersChanged(PlexServers);
             }
