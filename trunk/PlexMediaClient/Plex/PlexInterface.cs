@@ -8,6 +8,7 @@ using PlexMediaClient.Plex;
 using System.IO;
 using System.Drawing;
 using PlexMediaClient.Util;
+using System.Threading;
 
 namespace PlexMediaClient.Plex {
     static class PlexInterface {
@@ -18,6 +19,8 @@ namespace PlexMediaClient.Plex {
 
         public static event OnResponseProgressEventHandler OnResponseProgress;
         public delegate void OnResponseProgressEventHandler(int progress);
+        public static event OnResponseReceivedEventHandler OnResponseReceived;
+        public delegate void OnResponseReceivedEventHandler(MediaContainer response);
         public static event OnPlexErrorEventHandler OnPlexError;
         public delegate void OnPlexErrorEventHandler(Exception e);
         public static event OnPlexConnectedEventHandler OnPlexConnected;
@@ -25,35 +28,52 @@ namespace PlexMediaClient.Plex {
 
         static PlexInterface() {
             _webClient = new WebClient();
+            _webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(_webClient_DownloadDataCompleted);
+            _webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(_webClient_DownloadProgressChanged);
         }
 
-        internal static bool Login(PlexServer plexServer) {
+        private static object lockObj = new object();
+
+        static void _webClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
+            OnResponseProgress(e.ProgressPercentage);
+            Console.WriteLine(e.ProgressPercentage + " (" + e.BytesReceived + " / " + e.TotalBytesToReceive + ")");
+        }
+
+        static void _webClient_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e) {            
+            OnResponseReceived(XmlSerialization.DeSerializeXML<MediaContainer>(System.Text.ASCIIEncoding.Default.GetString(e.Result)));                
+        }               
+
+        public static bool Login(PlexServer plexServer) {
            return ServerManager.Instance.Authenticate(ref _webClient, plexServer);            
         }
 
-        public static MediaContainer TryGetPlexSections(PlexServer plexServer) {
-            return RequestPlexItems(plexServer.UriPlexSections);
+        public static MediaContainer TryGetPlexSections() {
+            return TryGetPlexSections(ServerManager.Instance.PlexServerCurrent);
         }
 
-        public static MediaContainer RequestPlexItems(Uri selectedPath) {
-            try {
-                MediaContainer requestedContainer = XmlSerialization.DeSerializeXML<MediaContainer>(_webClient.DownloadString(selectedPath));
+        public static MediaContainer TryGetPlexSections(PlexServer plexServer) {
+            if (Login(plexServer)) {
+                try {
+                    ServerManager.Instance.SetPlexServer(plexServer);
+                    return RequestPlexItems(plexServer.UriPlexSections);
+                } catch (Exception e) {
+                    throw e;
+                }
+            } else {
+                throw new UnauthorizedAccessException();
+            }
+        }
+
+        public static MediaContainer RequestPlexItems(Uri selectedPath) {   
+            try {              
+                MediaContainer requestedContainer = XmlSerialization.DeSerializeXML<MediaContainer>(_webClient.DownloadString(selectedPath));                
                 requestedContainer.UriSource = selectedPath;
                 return requestedContainer;
             } catch (Exception e) {
                 OnPlexError(e);
-                return null;
+                throw e;               
             }
-        }
-
-
-        internal static MediaContainer TryConnectLastServer() {
-            if (PlexServersAvailable && Login(ServerManager.Instance.PlexServerCurrent)) {
-                  return TryGetPlexSections(ServerManager.Instance.PlexServerCurrent);                     
-            } else {
-                return null;
-            }
-        }
+        }        
 
         internal static bool PlexServersAvailable {
             get {
@@ -65,6 +85,10 @@ namespace PlexMediaClient.Plex {
 
         internal static void RefreshBonjourServers() {
             ServerManager.Instance.RefrehBonjourServers();
-        }       
+        }
+
+        internal static void RequestPlexItemsAsync(Uri path) {
+            _webClient.DownloadDataAsync(path);
+        }
     }
 }

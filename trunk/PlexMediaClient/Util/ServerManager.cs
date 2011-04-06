@@ -42,10 +42,9 @@ namespace PlexMediaClient.Util {
             private set {
                 _plexServerCurrent = value;
                 if (!PlexServers.Contains(value)) {
-                    PlexServers.Insert(0, value);
+                    PlexServers.Insert(0, value);                    
                 }
-                SavePlexServers(PlexServers);
-               
+                SavePlexServers(PlexServers);               
             }
         }
 
@@ -77,8 +76,7 @@ namespace PlexMediaClient.Util {
 
 
         public void SetPlexServer(PlexServer server) {
-           
-            //Login(server);
+            PlexServerCurrent = server;
         }
 
         void BonjourDiscovery_OnBonjourServer(PlexServer bojourDiscoveredServer) {
@@ -95,6 +93,7 @@ namespace PlexMediaClient.Util {
             }
             BonjourDiscovery.RefreshBonjourDiscovery();
         }               
+
 
         internal bool Authenticate(ref System.Net.WebClient _webClient, PlexServer plexServer) {
             if (plexServer.Authenticate(ref _webClient)) {

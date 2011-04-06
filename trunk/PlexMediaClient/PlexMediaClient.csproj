@@ -73,6 +73,8 @@
     <Compile Include="Gui\MenuItem.cs" />
     <Compile Include="Gui\MenuNavigation.cs" />
     <Compile Include="Gui\PlexItem.cs" />
+    <Compile Include="Gui\PlexItemDirectory.cs" />
+    <Compile Include="Gui\PlexItemVideo.cs" />
     <Compile Include="Plex\PlexServer.cs" />
     <Compile Include="Plex\Xml\PlexWebProtocol.cs">
       <DependentUpon>PlexWebProtocol.xsd</DependentUpon>
@@ -89,6 +91,7 @@
     <Compile Include="Util\BonjourDiscovery.cs" />
     <Compile Include="Util\Encryption.cs" />
     <Compile Include="Util\ServerManager.cs" />
+    <Compile Include="Util\Transcoding.cs" />
     <Compile Include="Util\XmlSerialization.cs" />
     <EmbeddedResource Include="Gui\DialogNewPlexServer.resx">
       <DependentUpon>DialogNewPlexServer.cs</DependentUpon>
