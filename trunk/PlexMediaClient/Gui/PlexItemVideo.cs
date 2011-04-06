@@ -19,7 +19,7 @@ namespace PlexMediaClient.Gui {
 
         public override Image Icon {
             get {
-                return ArtWorkRetrieval.GetArtWork(Video.thumb);
+                return ArtWorkRetrieval.GetArtWork(Video.thumb ?? Video.art);
             }
         }
 
@@ -28,6 +28,7 @@ namespace PlexMediaClient.Gui {
         }
 
         public override void OnClicked(object sender, EventArgs e) {
+           string t = Transcoding.GetTranscodeUrl(ServerManager.Instance.PlexServerCurrent, Video.Media[0].Part[0].key);
             base.OnClicked(sender, e);
         }
 

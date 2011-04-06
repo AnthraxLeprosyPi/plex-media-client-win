@@ -14,20 +14,8 @@ namespace PlexMediaClient.Gui {
         public PlexItem(IMenuItem parentItem, string title, Uri path) : base(parentItem, title) {
             if (path != null) {
                 Path = path.AbsoluteUri.Contains("?") ? path : new Uri(VirtualPathUtility.AppendTrailingSlash(path.AbsoluteUri));
-            }
-            PlexInterface.OnResponseProgress += new PlexInterface.OnResponseProgressEventHandler(PlexInterface_OnResponseProgress);
-            PlexInterface.OnResponseReceived += new PlexInterface.OnResponseReceivedEventHandler(PlexInterface_OnResponseReceived);
-        }
-
-        void PlexInterface_OnResponseReceived(MediaContainer response) {
-            SetChildItems(MenuNavigation.GetSubMenuItems(this, response));
-            MenuNavigation.ShowCurrentMenu(this);
-        }
-
-
-        void PlexInterface_OnResponseProgress(int progress) {
-           
-        }
+            }          
+        }     
 
         public override System.Drawing.Image Icon {
             get {
@@ -37,9 +25,10 @@ namespace PlexMediaClient.Gui {
 
         public override void OnClicked(object sender, EventArgs e) {
             try {
-                PlexInterface.RequestPlexItemsAsync(Path);
+                SetChildItems(MenuNavigation.GetSubMenuItems(this, PlexInterface.RequestPlexItems(Path)));
+                MenuNavigation.ShowCurrentMenu(this);
             } catch {
-                throw;
+              
             }            
         }
     }

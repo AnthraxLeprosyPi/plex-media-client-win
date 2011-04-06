@@ -30,9 +30,7 @@ namespace PlexMediaClient.Plex {
             _webClient = new WebClient();
             _webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(_webClient_DownloadDataCompleted);
             _webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(_webClient_DownloadProgressChanged);
-        }
-
-        private static object lockObj = new object();
+        }               
 
         static void _webClient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
             OnResponseProgress(e.ProgressPercentage);

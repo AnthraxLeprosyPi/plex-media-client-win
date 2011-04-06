@@ -28,23 +28,27 @@ namespace PlexMediaClient.Util {
             }
         }
 
+        private static object sync = new object();
+
         internal static Image GetArtWork(string imageIndex) {
-            if (String.IsNullOrEmpty(imageIndex)) {
-                return Properties.Resources.icon_empty_artwork;
-            } else if (!ImageCache.ContainsKey(imageIndex)) {
-                ImageCache.Add(imageIndex, Properties.Resources.icon_empty_artwork);
-                try {
-                    DownloadImage(imageIndex);
-                } catch { 
-                    //ToDo
+            lock (sync) {
+                if (String.IsNullOrEmpty(imageIndex)) {
+                    return Properties.Resources.icon_empty_artwork;
+                } else if (!ImageCache.ContainsKey(imageIndex)) {
+                    ImageCache.Add(imageIndex, Properties.Resources.icon_empty_artwork);
+                    try {
+                        DownloadImage(imageIndex);
+                    } catch {
+                        //ToDo
+                    }
                 }
+                return ImageCache[imageIndex];
             }
-            return ImageCache[imageIndex];
         }
 
         internal static void DownloadImage(string imageIndex) {
-            WebClient ArtWorkRetriever = new WebClient();            
-            ServerManager.Instance.PlexServerCurrent.AddAuthHeaders(ref ArtWorkRetriever);            
+            WebClient ArtWorkRetriever = new WebClient();
+            ServerManager.Instance.PlexServerCurrent.AddAuthHeaders(ref ArtWorkRetriever);
             ArtWorkRetriever.DownloadDataCompleted += new DownloadDataCompletedEventHandler(ArtWorkRetriever_DownloadDataCompleted);
             ArtWorkRetriever.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ArtWorkRetriever_DownloadProgressChanged);
             ArtWorkRetriever.DownloadDataAsync(new Uri(ServerManager.Instance.PlexServerCurrent.UriPlexBase, imageIndex), imageIndex);
@@ -63,8 +67,8 @@ namespace PlexMediaClient.Util {
                 if (e.UserState is string) {
                     string artWorkIndex = (string)e.UserState;
                     if (ImageCache.ContainsKey(artWorkIndex)) {
-                        using (MemoryStream ms = new MemoryStream(e.Result)) {
-                            ImageCache[artWorkIndex] = Image.FromStream(ms);
+                        using (MemoryStream ms = new MemoryStream(e.Result)) {                                                   
+                            ImageCache[artWorkIndex] = Image.FromStream(ms);                            
                             OnArtWorkRetrieved();
                         }
                     }

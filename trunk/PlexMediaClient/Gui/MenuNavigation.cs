@@ -109,7 +109,7 @@ namespace PlexMediaClient.Gui {
             //Add ActionItems
             List<IMenuItem> tmpList = new List<IMenuItem>();
             tmpList.AddRange(plexResponseConatiner.Directory.ConvertAll<IMenuItem>(dir => new PlexItemDirectory(parentItem, dir.title, new Uri(parentItem.Path, dir.key), dir)));
-            tmpList.AddRange(plexResponseConatiner.Video.ConvertAll<IMenuItem>(vid => new PlexItem(parentItem, vid.title, new Uri(parentItem.Path, vid.key))));
+            tmpList.AddRange(plexResponseConatiner.Video.ConvertAll<IMenuItem>(vid => new PlexItemVideo(parentItem, vid.title, new Uri(parentItem.Path, vid.key), vid)));
             return tmpList;
         }
 
