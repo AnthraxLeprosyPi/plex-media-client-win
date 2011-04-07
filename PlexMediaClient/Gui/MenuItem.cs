@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using PlexMediaClient.Util;
 
 namespace PlexMediaClient.Gui {
     public class MenuItem : IMenuItem {
@@ -43,7 +44,8 @@ namespace PlexMediaClient.Gui {
         }
              
         public virtual void OnSelected() {
-            return;
+            MediaRetrieval.ShowLargeArtWork(Icon);
+            MediaRetrieval.ShowDetails(this);
         }
        
     }

@@ -57,8 +57,22 @@ namespace PlexMediaClient.Plex {
                 } catch (Exception e) {
                     throw e;
                 }
+            } else {                
+                return null;
+            }
+        }
+
+        public static MediaContainer TryGetPlexServerRoot(PlexServer plexServer) {
+            if (Login(plexServer)) {
+                try {
+                    ServerManager.Instance.SetPlexServer(plexServer);
+                    return RequestPlexItems(plexServer.UriPlexBase);
+                } catch (Exception e) {
+                    throw e;
+                }
             } else {
-                throw new UnauthorizedAccessException();
+                OnPlexError(new Exception("Unable to login to:" + plexServer.HostAdress));
+                return null;
             }
         }
 

@@ -50,7 +50,7 @@ namespace PlexMediaClient.Gui {
         }
 
         static void ServerManager_OnPlexServersChanged(List<PlexServer> updatedServerList) {
-            ServerMenu = updatedServerList.ConvertAll<IMenuItem>(svr => new ActionItem(ServerItem, svr.HostAdress, Properties.Resources.icon_server_offline, () => ShowRootMenu(PlexInterface.TryGetPlexSections(svr))));
+            ServerMenu = updatedServerList.ConvertAll<IMenuItem>(svr => new ActionItem(ServerItem, svr.HostAdress, Properties.Resources.icon_server_offline, () => ShowRootMenu(PlexInterface.TryGetPlexServerRoot(svr))));
             ServerMenu.Add(new ActionItem(null, "Add New...", Properties.Resources.icon_server_online, () => AddNewServer()));
             ServerMenu.Add(new ActionItem(null, "Refresh Bonjouor...", Properties.Resources.icon_server_bonjour, () => PlexInterface.RefreshBonjourServers()));
             ServerItem.SetChildItems(ServerMenu);

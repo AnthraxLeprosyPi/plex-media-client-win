@@ -18,7 +18,7 @@ namespace PlexMediaClient.Gui {
 
         public override System.Drawing.Image Icon {
             get {
-                return ArtWorkRetrieval.GetArtWork(Directory.thumb ?? Directory.art);
+                return MediaRetrieval.GetArtWork(Directory.thumb ?? Directory.art);
             }
         }
 
@@ -27,7 +27,10 @@ namespace PlexMediaClient.Gui {
         }
 
         public override void OnSelected() {
-            base.OnSelected();
+            MediaRetrieval.ShowLargeArtWork(MediaRetrieval.GetArtWork(Directory.art ?? Directory.thumb));
+            MediaRetrieval.ShowDetails(Directory);
         }
+
+      
     }
 }

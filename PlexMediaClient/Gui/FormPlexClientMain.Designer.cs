@@ -27,13 +27,22 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPlexClientMain));
             this.MenuPane = new System.Windows.Forms.DataGridView();
             this.iconDataGridViewImageColumn = new System.Windows.Forms.DataGridViewImageColumn();
             this.titleDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.iMenuItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.propertyGridDetails = new System.Windows.Forms.PropertyGrid();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.pictureBoxArtWork = new System.Windows.Forms.PictureBox();
+            this.mediaPLayer = new AxAXVLC.AxVLCPlugin2();
             ((System.ComponentModel.ISupportInitialize)(this.MenuPane)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).BeginInit();
+            this.tableLayoutPanel1.SuspendLayout();
+            this.flowLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.mediaPLayer)).BeginInit();
             this.SuspendLayout();
             // 
             // MenuPane
@@ -108,10 +117,29 @@
             // 
             this.iMenuItemBindingSource.DataSource = typeof(PlexMediaClient.Gui.IMenuItem);
             // 
+            // propertyGridDetails
+            // 
+            this.propertyGridDetails.CategoryForeColor = System.Drawing.Color.DarkOrange;
+            this.propertyGridDetails.CommandsForeColor = System.Drawing.Color.DarkOrange;
+            this.propertyGridDetails.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGridDetails.HelpVisible = false;
+            this.propertyGridDetails.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.propertyGridDetails.LineColor = System.Drawing.Color.Black;
+            this.propertyGridDetails.Location = new System.Drawing.Point(0, 459);
+            this.propertyGridDetails.Margin = new System.Windows.Forms.Padding(0);
+            this.propertyGridDetails.Name = "propertyGridDetails";
+            this.propertyGridDetails.Size = new System.Drawing.Size(724, 309);
+            this.propertyGridDetails.TabIndex = 0;
+            this.propertyGridDetails.ToolbarVisible = false;
+            this.propertyGridDetails.ViewBackColor = System.Drawing.Color.Black;
+            this.propertyGridDetails.ViewForeColor = System.Drawing.Color.DarkOrange;
+            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.propertyGridDetails, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(300, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -120,6 +148,39 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40.10417F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(724, 768);
             this.tableLayoutPanel1.TabIndex = 5;
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.flowLayoutPanel1.Controls.Add(this.pictureBoxArtWork);
+            this.flowLayoutPanel1.Controls.Add(this.mediaPLayer);
+            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(724, 459);
+            this.flowLayoutPanel1.TabIndex = 1;
+            // 
+            // pictureBoxArtWork
+            // 
+            this.pictureBoxArtWork.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxArtWork.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxArtWork.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxArtWork.Name = "pictureBoxArtWork";
+            this.pictureBoxArtWork.Size = new System.Drawing.Size(724, 0);
+            this.pictureBoxArtWork.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxArtWork.TabIndex = 2;
+            this.pictureBoxArtWork.TabStop = false;
+            // 
+            // mediaPLayer
+            // 
+            this.mediaPLayer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mediaPLayer.Enabled = true;
+            this.mediaPLayer.Location = new System.Drawing.Point(3, 3);
+            this.mediaPLayer.Name = "mediaPLayer";
+            this.mediaPLayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("mediaPLayer.OcxState")));
+            this.mediaPLayer.Size = new System.Drawing.Size(320, 0);
+            this.mediaPLayer.TabIndex = 3;
             // 
             // FormPlexClientMain
             // 
@@ -139,6 +200,10 @@
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.MenuPane)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).EndInit();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.flowLayoutPanel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.mediaPLayer)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -149,7 +214,11 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn titleDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewImageColumn iconDataGridViewImageColumn;
         private System.Windows.Forms.DataGridView MenuPane;
+        private System.Windows.Forms.PropertyGrid propertyGridDetails;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.PictureBox pictureBoxArtWork;
+        private AxAXVLC.AxVLCPlugin2 mediaPLayer;
 
     }
 }
