@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using PlexMediaClient.Plex;
 using System.Security.Cryptography;
+using System.IO;
+using System.Net;
 
 namespace PlexMediaClient.Util {
    public static class Transcoding {
 
-      public static List<string> GetM3U8Playlist(PlexServer plexServer, string partKey) {
+      public static string GetM3U8Playlist(PlexServer plexServer, string partKey) {
            // unix time is the number of milliseconds from 1/1/1970 to now..
 
            DateTime jan1 = new DateTime(1970, 1, 1, 0, 0, 0);
@@ -19,7 +21,7 @@ namespace PlexMediaClient.Util {
            string time = Math.Round(dTime / 1000).ToString();
 
            // the basic url WITH the part key is:
-          string url = "/video/:/transcode/segmented/start.m3u8?identifier=com.plexapp.plugins.library&offset=0&quality=5&url=" + Uri.EscapeDataString(new Uri(plexServer.UriPlexBase,partKey).AbsoluteUri) + "&3g=0&httpCookies=&userAgent=";
+          string url = plexServer.UriPlexBase + "video/:/transcode/segmented/start.m3u8?identifier=com.plexapp.plugins.library&offset=0&quality=5&url=" + Uri.EscapeDataString(new Uri(plexServer.UriPlexBase,partKey).AbsoluteUri) + "&3g=0";
 
            // the message to hash is url + an @ + the rounded time
            string msg = url + "@" + time;
@@ -47,8 +49,34 @@ namespace PlexMediaClient.Util {
            wc.Headers.Add("X-Plex-Access-Key", publicKey);
            wc.Headers.Add("X-Plex-Access-Time", time);
            wc.Headers.Add("X-Plex-Access-Code", token);
-           string m3u8Content = wc.DownloadString (new Uri(plexServer.UriPlexBase, url));          
-           
+           string m3u8Content = wc.DownloadString(url);
+
+           string s = wc.DownloadString(plexServer.UriPlexBase + url);
+
+           s = s.Substring(s.IndexOf("session")).Replace("\n", "");
+
+           s = plexServer.UriPlexBase.AbsoluteUri + "/video/:/transcode/segmented/" + s;
+
+           string cookie = wc.ResponseHeaders[HttpResponseHeader.SetCookie];
+
+           wc = new WebClient();
+
+           try {
+               if (cookie != null && cookie.Length > 0)
+                   wc.Headers[HttpRequestHeader.Cookie] = cookie;
+
+               s = wc.DownloadString(s);
+           } catch (Exception x) {
+             
+           }
+
+           s = s.Replace("/video", plexServer.UriPlexBase.AbsoluteUri + "/video");
+
+           StreamWriter sw = File.CreateText("playlist.m3u8");
+           sw.Write(s);
+           sw.Flush();
+           sw.Close();
+           return m3u8Content;
        }
 
     }

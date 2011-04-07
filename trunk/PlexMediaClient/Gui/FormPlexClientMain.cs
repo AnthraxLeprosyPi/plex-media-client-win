@@ -130,6 +130,7 @@ namespace PlexMediaClient.Gui {
                 try {
                     string t = Transcoding.GetM3U8Playlist(ServerManager.Instance.PlexServerCurrent, ((PlexItemVideo)SelectedMenuItem).Video.Media[0].Part[0].key);
                     mediaPLayer.playlist.add(t);
+                    
                     mediaPLayer.playlist.play();
                 } catch {
 
