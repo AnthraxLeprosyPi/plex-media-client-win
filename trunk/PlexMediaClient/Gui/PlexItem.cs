@@ -8,9 +8,7 @@ using PlexMediaClient.Plex.Xml;
 using PlexMediaClient.Util;
 
 namespace PlexMediaClient.Gui {
-    class PlexItem : MenuItem {
-         
-
+    class PlexItem : MenuItem {        
         public PlexItem(IMenuItem parentItem, string title, Uri path) : base(parentItem, title) {
             if (path != null) {
                 Path = path.AbsoluteUri.Contains("?") ? path : new Uri(VirtualPathUtility.AppendTrailingSlash(path.AbsoluteUri));
@@ -19,7 +17,7 @@ namespace PlexMediaClient.Gui {
 
         public override System.Drawing.Image Icon {
             get {
-                return ArtWorkRetrieval.GetArtWork(Path.AbsoluteUri);
+                return MediaRetrieval.GetArtWork(Path.AbsoluteUri);
             }
         }
 

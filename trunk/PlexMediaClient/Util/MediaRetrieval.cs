@@ -10,14 +10,20 @@ using System.Net;
 using System.IO;
 
 namespace PlexMediaClient.Util {
-    static class ArtWorkRetrieval {
+    static class MediaRetrieval {
 
         public static event OnArtWorkRetrievedEventHandler OnArtWorkRetrieved;
         public delegate void OnArtWorkRetrievedEventHandler();
+        public static event OnShowLargeArtWorkEventHandler OnShowLargeArtWork;
+        public delegate void OnShowLargeArtWorkEventHandler(Image largeArtWork);
+        public static event OnDetailsRetrievedEventHandler OnDetailsRetrieved;
+        public delegate void OnDetailsRetrievedEventHandler(object infoObject);
+        public static event OnPlayListRetrievedEventHandler OnPlayListRetrieved;
+        public delegate void OnPlayListRetrievedEventHandler(object playList);
 
         private static Dictionary<string, Image> ImageCache { get; set; }
 
-        static ArtWorkRetrieval() {
+        static MediaRetrieval() {
             ImageCache = new Dictionary<string, Image>();
             foreach (string plexType in Enum.GetNames(typeof(EPlexItemTypes))) {
                 try {
@@ -54,6 +60,10 @@ namespace PlexMediaClient.Util {
             ArtWorkRetriever.DownloadDataAsync(new Uri(ServerManager.Instance.PlexServerCurrent.UriPlexBase, imageIndex), imageIndex);
         }
 
+        internal static void ShowLargeArtWork(Image largeArtWork) {
+            OnShowLargeArtWork(largeArtWork);
+        }
+
         static void ArtWorkRetriever_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
             //throw new NotImplementedException();
         }
@@ -67,13 +77,19 @@ namespace PlexMediaClient.Util {
                 if (e.UserState is string) {
                     string artWorkIndex = (string)e.UserState;
                     if (ImageCache.ContainsKey(artWorkIndex)) {
-                        using (MemoryStream ms = new MemoryStream(e.Result)) {                                                   
-                            ImageCache[artWorkIndex] = Image.FromStream(ms);                            
-                            OnArtWorkRetrieved();
+                        using (MemoryStream ms = new MemoryStream(e.Result)) {
+                            try {
+                                ImageCache[artWorkIndex] = Image.FromStream(ms);
+                                OnArtWorkRetrieved();
+                            } catch { }
                         }
                     }
                 }
             }
+        }
+        
+        internal static void ShowDetails(object infoObject) {
+            OnDetailsRetrieved(infoObject);
         }
     }
 }
