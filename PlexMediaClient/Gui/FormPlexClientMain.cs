@@ -33,7 +33,13 @@ namespace PlexMediaClient.Gui {
             MediaRetrieval.OnShowLargeArtWork += new MediaRetrieval.OnShowLargeArtWorkEventHandler(ArtWorkRetrieval_OnShowLargeArtWork);
             MediaRetrieval.OnDetailsRetrieved += new MediaRetrieval.OnDetailsRetrievedEventHandler(DetailsRetrieval_OnDetailsRetrieved);
             MediaRetrieval.OnPlayListRetrieved += new MediaRetrieval.OnPlayListRetrievedEventHandler(MediaRetrieval_OnPlayListRetrieved);
+            Transcoding.OnMediaBuffered += new Transcoding.OnMediaBufferedEventHandler(Transcoding_OnMediaBuffered);
 
+        }
+
+
+        void Transcoding_OnMediaBuffered(string mediaFileName) {
+            this.Invoke(new MethodInvoker(delegate() { /*mediaPLayer.playlist.add(mediaFileName); mediaPLayer.playlist.play();*/ axWindowsMediaPlayer1.URL = mediaFileName; }));
         }
 
         void MediaRetrieval_OnPlayListRetrieved(object playList) {
@@ -59,7 +65,7 @@ namespace PlexMediaClient.Gui {
 
         private IMenuItem SelectedMenuItem { get; set; }
 
-        void ArtWorkRetrieval_OnArtWorkRetrieved() {            
+        void ArtWorkRetrieval_OnArtWorkRetrieved() {
             this.Invoke(new MethodInvoker(delegate() {
                 MenuPane.SuspendLayout();
                 MenuPane.InvalidateColumn(iconDataGridViewImageColumn.Index);
@@ -122,16 +128,18 @@ namespace PlexMediaClient.Gui {
                 return;
             }
             menuPane_SelectionChanged(sender, e);
-            mediaPLayer.BaseURL = ServerManager.Instance.PlexServerCurrent.UriPlexBase.AbsoluteUri;
             mediaPLayer.play += new EventHandler(mediaPLayer_play);
             mediaPLayer.MediaPlayerEncounteredError += new EventHandler(mediaPLayer_MediaPlayerEncounteredError);
             mediaPLayer.MediaPlayerPlaying += new EventHandler(mediaPLayer_MediaPlayerPlaying);
+            mediaPLayer.MediaPlayerStopped += new EventHandler(mediaPLayer_MediaPlayerStopped);
+            mediaPLayer.MediaPlayerBuffering += new EventHandler(mediaPLayer_MediaPlayerBuffering);
+
+            axWindowsMediaPlayer1.pl
             if (SelectedMenuItem is PlexItemVideo) {
                 try {
-                    string t = Transcoding.GetM3U8Playlist(ServerManager.Instance.PlexServerCurrent, ((PlexItemVideo)SelectedMenuItem).Video.Media[0].Part[0].key);
-                    mediaPLayer.playlist.add(t);
-                    
-                    mediaPLayer.playlist.play();
+                    this.SuspendLayout();
+                    Transcoding.BufferMedia(ServerManager.Instance.PlexServerCurrent, ((PlexItemVideo)SelectedMenuItem).Video.Media[0].Part[0].key);
+
                 } catch {
 
                 }
@@ -141,16 +149,28 @@ namespace PlexMediaClient.Gui {
             //MenuNavigation.FetchItems(((List<ListItem>)listItemBindingSource.DataSource)[e.RowIndex]);
         }
 
+        void axWindowsMediaPlayer1_Buffering(object sender, AxWMPLib._WMPOCXEvents_BufferingEvent e) {
+
+        }
+
+        void mediaPLayer_MediaPlayerBuffering(object sender, EventArgs e) {
+
+        }
+
+        void mediaPLayer_MediaPlayerStopped(object sender, EventArgs e) {
+            this.Invoke(new MethodInvoker(delegate() { pictureBoxArtWork.BringToFront(); mediaPLayer.SendToBack(); }));
+        }
+
         void mediaPLayer_MediaPlayerEncounteredError(object sender, EventArgs e) {
-            
+            this.Invoke(new MethodInvoker(delegate() { pictureBoxArtWork.BringToFront(); mediaPLayer.SendToBack(); }));
         }
 
         void mediaPLayer_MediaPlayerPlaying(object sender, EventArgs e) {
-            
+            this.Invoke(new MethodInvoker(delegate() { pictureBoxArtWork.SendToBack(); mediaPLayer.BringToFront(); }));
         }
 
         void mediaPLayer_play(object sender, EventArgs e) {
-            
+
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData) {
@@ -169,7 +189,9 @@ namespace PlexMediaClient.Gui {
                     break;
                 case Keys.MediaPlayPause:
                 case Keys.Play:
-                    //MediaPlayer.PlayItem();
+                    if (mediaPLayer.playlist.isPlaying) {
+                        mediaPLayer.playlist.togglePause();
+                    }
                     break;
                 case Keys.Back:
                 case Keys.BrowserBack:
@@ -187,6 +209,12 @@ namespace PlexMediaClient.Gui {
                 case Keys.Left:
                     Shrink();
                     break;
+                case Keys.MediaStop:
+                    if (mediaPLayer.playlist.isPlaying) {
+                        mediaPLayer.playlist.stop();
+                        Transcoding.StopBuffering();
+                    }
+                    break;
                 default:
                     break;
             }
@@ -197,7 +225,7 @@ namespace PlexMediaClient.Gui {
         private void Shrink() {
             Rectangle rec = Screen.GetWorkingArea(this);
             while (rec.Width > 300) {
-                rec.Width -= 5;
+                rec.Width -= 50;
                 Bounds = rec;
             }
         }
@@ -206,14 +234,19 @@ namespace PlexMediaClient.Gui {
             int maxWidth = Screen.GetWorkingArea(this).Width;
             Rectangle bounds = Bounds;
             while (bounds.Width < maxWidth) {
-                bounds.Width += 5;
+                bounds.Width += 50;
                 Bounds = bounds;
             }
         }
 
         private void menuPane_SelectionChanged(object sender, EventArgs e) {
             try {
+                //pictureBoxArtWork.BringToFront();
+                //mediaPLayer.SendToBack();
                 SelectedMenuItem = ((List<IMenuItem>)iMenuItemBindingSource.DataSource)[MenuPane.SelectedRows[0].Index];
+                if (SelectedMenuItem is PlexItemVideo) {
+                    Expand();
+                }
                 SelectedMenuItem.OnSelected();
             } catch { }
         }
@@ -223,5 +256,16 @@ namespace PlexMediaClient.Gui {
                 ((List<IMenuItem>)iMenuItemBindingSource.DataSource)[e.RowIndex].OnPaint(sender, e);
             }
         }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e) {
+            Transcoding.StopBuffering();
+            base.OnClosing(e);
+        }
+
+        private void axWindowsMediaPlayer1_DoubleClickEvent(object sender, AxWMPLib._WMPOCXEvents_DoubleClickEvent e) {
+            try {
+                axWindowsMediaPlayer1.fullScreen = !axWindowsMediaPlayer1.fullScreen;
+            } catch { }
+        }      
     }
 }
