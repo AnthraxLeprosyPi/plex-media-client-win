@@ -34,13 +34,15 @@
             this.iMenuItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.propertyGridDetails = new System.Windows.Forms.PropertyGrid();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
             this.pictureBoxArtWork = new System.Windows.Forms.PictureBox();
             this.mediaPLayer = new AxAXVLC.AxVLCPlugin2();
             ((System.ComponentModel.ISupportInitialize)(this.MenuPane)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
-            this.flowLayoutPanel1.SuspendLayout();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.mediaPLayer)).BeginInit();
             this.SuspendLayout();
@@ -125,10 +127,10 @@
             this.propertyGridDetails.HelpVisible = false;
             this.propertyGridDetails.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.propertyGridDetails.LineColor = System.Drawing.Color.Black;
-            this.propertyGridDetails.Location = new System.Drawing.Point(0, 459);
+            this.propertyGridDetails.Location = new System.Drawing.Point(0, 619);
             this.propertyGridDetails.Margin = new System.Windows.Forms.Padding(0);
             this.propertyGridDetails.Name = "propertyGridDetails";
-            this.propertyGridDetails.Size = new System.Drawing.Size(724, 309);
+            this.propertyGridDetails.Size = new System.Drawing.Size(724, 149);
             this.propertyGridDetails.TabIndex = 0;
             this.propertyGridDetails.ToolbarVisible = false;
             this.propertyGridDetails.ViewBackColor = System.Drawing.Color.Black;
@@ -139,27 +141,40 @@
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Controls.Add(this.propertyGridDetails, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(300, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 59.89583F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40.10417F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 80.59896F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 19.40104F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(724, 768);
             this.tableLayoutPanel1.TabIndex = 5;
             // 
-            // flowLayoutPanel1
+            // panel1
             // 
-            this.flowLayoutPanel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.flowLayoutPanel1.Controls.Add(this.pictureBoxArtWork);
-            this.flowLayoutPanel1.Controls.Add(this.mediaPLayer);
-            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(724, 459);
-            this.flowLayoutPanel1.TabIndex = 1;
+            this.panel1.Controls.Add(this.axWindowsMediaPlayer1);
+            this.panel1.Controls.Add(this.pictureBoxArtWork);
+            this.panel1.Controls.Add(this.mediaPLayer);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(718, 613);
+            this.panel1.TabIndex = 1;
+            // 
+            // axWindowsMediaPlayer1
+            // 
+            this.axWindowsMediaPlayer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.axWindowsMediaPlayer1.Enabled = true;
+            this.axWindowsMediaPlayer1.Location = new System.Drawing.Point(0, 0);
+            this.axWindowsMediaPlayer1.Margin = new System.Windows.Forms.Padding(0);
+            this.axWindowsMediaPlayer1.Name = "axWindowsMediaPlayer1";
+            this.axWindowsMediaPlayer1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axWindowsMediaPlayer1.OcxState")));
+            this.axWindowsMediaPlayer1.Size = new System.Drawing.Size(718, 613);
+            this.axWindowsMediaPlayer1.TabIndex = 8;
+            this.axWindowsMediaPlayer1.DoubleClickEvent += new AxWMPLib._WMPOCXEvents_DoubleClickEventHandler(this.axWindowsMediaPlayer1_DoubleClickEvent);
             // 
             // pictureBoxArtWork
             // 
@@ -167,20 +182,20 @@
             this.pictureBoxArtWork.Location = new System.Drawing.Point(0, 0);
             this.pictureBoxArtWork.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBoxArtWork.Name = "pictureBoxArtWork";
-            this.pictureBoxArtWork.Size = new System.Drawing.Size(724, 0);
+            this.pictureBoxArtWork.Size = new System.Drawing.Size(718, 613);
             this.pictureBoxArtWork.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBoxArtWork.TabIndex = 2;
+            this.pictureBoxArtWork.TabIndex = 7;
             this.pictureBoxArtWork.TabStop = false;
             // 
             // mediaPLayer
             // 
             this.mediaPLayer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mediaPLayer.Enabled = true;
-            this.mediaPLayer.Location = new System.Drawing.Point(3, 3);
+            this.mediaPLayer.Location = new System.Drawing.Point(0, 0);
             this.mediaPLayer.Name = "mediaPLayer";
             this.mediaPLayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("mediaPLayer.OcxState")));
-            this.mediaPLayer.Size = new System.Drawing.Size(320, 0);
-            this.mediaPLayer.TabIndex = 3;
+            this.mediaPLayer.Size = new System.Drawing.Size(718, 613);
+            this.mediaPLayer.TabIndex = 6;
             // 
             // FormPlexClientMain
             // 
@@ -201,7 +216,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.MenuPane)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.flowLayoutPanel1.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.mediaPLayer)).EndInit();
             this.ResumeLayout(false);
@@ -216,9 +232,10 @@
         private System.Windows.Forms.DataGridView MenuPane;
         private System.Windows.Forms.PropertyGrid propertyGridDetails;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.PictureBox pictureBoxArtWork;
         private AxAXVLC.AxVLCPlugin2 mediaPLayer;
+        private AxWMPLib.AxWindowsMediaPlayer axWindowsMediaPlayer1;
 
     }
 }
