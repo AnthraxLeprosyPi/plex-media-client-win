@@ -37,14 +37,12 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
             this.pictureBoxArtWork = new System.Windows.Forms.PictureBox();
-            this.mediaPLayer = new AxAXVLC.AxVLCPlugin2();
             ((System.ComponentModel.ISupportInitialize)(this.MenuPane)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mediaPLayer)).BeginInit();
             this.SuspendLayout();
             // 
             // MenuPane
@@ -155,9 +153,8 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.axWindowsMediaPlayer1);
             this.panel1.Controls.Add(this.pictureBoxArtWork);
-            this.panel1.Controls.Add(this.mediaPLayer);
+            this.panel1.Controls.Add(this.axWindowsMediaPlayer1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
@@ -187,16 +184,6 @@
             this.pictureBoxArtWork.TabIndex = 7;
             this.pictureBoxArtWork.TabStop = false;
             // 
-            // mediaPLayer
-            // 
-            this.mediaPLayer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mediaPLayer.Enabled = true;
-            this.mediaPLayer.Location = new System.Drawing.Point(0, 0);
-            this.mediaPLayer.Name = "mediaPLayer";
-            this.mediaPLayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("mediaPLayer.OcxState")));
-            this.mediaPLayer.Size = new System.Drawing.Size(718, 613);
-            this.mediaPLayer.TabIndex = 6;
-            // 
             // FormPlexClientMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -219,7 +206,6 @@
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mediaPLayer)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -234,7 +220,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.PictureBox pictureBoxArtWork;
-        private AxAXVLC.AxVLCPlugin2 mediaPLayer;
         private AxWMPLib.AxWindowsMediaPlayer axWindowsMediaPlayer1;
 
     }
