@@ -8,21 +8,29 @@ using System.IO;
 using System.Net;
 using System.ComponentModel;
 using System.Threading;
+using PlexMediaClient.Plex.Xml;
 
 namespace PlexMediaClient.Util {
     public static class Transcoding {
 
         public static event OnMediaBufferedEventHandler OnMediaBuffered;
         public delegate void OnMediaBufferedEventHandler(string mediaFileName);
+
         private static BackgroundWorker _mediaBufferer;
         private static WebClient _mediaFetcher;
+        private static int Quality { get; set; }
+        private static int Buffer { get; set; }
         private const string _bufferFile = @"D:\buffer.ts";
+        private const int _defaultBuffer = 5;
+        private const int _defaultQuality = 5;
         private static FileStream _bufferedMedia;
+
         static Transcoding() {
-            if(File.Exists(_bufferFile)){
+            if (File.Exists(_bufferFile)) {
                 File.Delete(_bufferFile);
             }
-            _bufferedMedia = new FileStream(_bufferFile, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
+            Buffer = _defaultBuffer;
+            Quality = _defaultQuality;
             _mediaFetcher = new WebClient();
             _mediaBufferer = new BackgroundWorker();
             _mediaBufferer.WorkerSupportsCancellation = true;
@@ -33,33 +41,48 @@ namespace PlexMediaClient.Util {
 
         }
 
-        static void _mediaBufferer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {           
-            
+        static void _mediaBufferer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+
         }
 
         static void MediaBufferer_DoWork(object sender, DoWorkEventArgs e) {
-            int count = 0;
-            foreach (string segment in (List<string>)e.Argument) {
-                if (_mediaBufferer.CancellationPending) {
-                    break;
+            ResetMediaBuffer();
+            if (sender is MediaContainerVideo) {                
+                int bufferedSegments = 0;
+                foreach (string currentPart in PlexInterface.GetAllVideoParts((MediaContainerVideo)sender)) {                    
+                    foreach (string segment in GetM3U8PlaylistItems(PlexInterface.PlexServerCurrent, currentPart)) {
+                        if (_mediaBufferer.CancellationPending) {
+                            return;
+                        }
+                        byte[] data = _mediaFetcher.DownloadData(segment);
+                        _bufferedMedia.Write(data, 0, data.Length);
+                        _bufferedMedia.Flush();
+                        _mediaBufferer.ReportProgress((int)_bufferedMedia.Length);
+                        if (++bufferedSegments == Buffer) {
+                            OnMediaBuffered(_bufferFile);
+                        }
+                    }
+                  
+
                 }
-                byte[] data = _mediaFetcher.DownloadData(segment);
-                _bufferedMedia.Write(data, 0, data.Length);
-                _bufferedMedia.Flush();
-                if(count++ == 4) {
-                    OnMediaBuffered(_bufferFile);
-                }
-                _mediaBufferer.ReportProgress((int)_bufferedMedia.Length);
+                _mediaFetcher.Dispose();
+                _bufferedMedia.Close();
             }
-            _mediaFetcher.Dispose();
-            _bufferedMedia.Close();
+        }
+
+        private static void ResetMediaBuffer() {
+            if (File.Exists(_bufferFile)) {
+                File.Delete(_bufferFile);
+            }
+            _bufferedMedia = new FileStream(_bufferFile, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
+            PlexInterface.PlexServerCurrent.AddAuthHeaders(ref _mediaFetcher);
         }
 
         static void MediaBufferer_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             Console.WriteLine(e.ProgressPercentage);
         }
 
-        public static List<string> GetM3U8Playlist(PlexServer plexServer, string partKey) {
+        public static IEnumerable<string> GetM3U8PlaylistItems(PlexServer plexServer, string partKey) {
             // unix time is the number of milliseconds from 1/1/1970 to now..          
             DateTime jan1 = new DateTime(1970, 1, 1, 0, 0, 0);
 
@@ -104,22 +127,13 @@ namespace PlexMediaClient.Util {
 
             wc = new WebClient();
 
-            try {
-                if (cookie != null && cookie.Length > 0)
-                    wc.Headers[HttpRequestHeader.Cookie] = cookie;
-
-                string playList = wc.DownloadString(playListRequest);
-                List<string> playListItems = playList.Split(new char[] { '\n' }).Where(item => item.EndsWith(".ts")).ToList();
-                List<string> returnList = new List<string>();
-                playListItems.ForEach(x => returnList.Add(playListRequest.Replace("index.m3u8", x)));
-                return returnList;
-            } catch (Exception x) {
-
+            if (cookie != null && cookie.Length > 0)
+                wc.Headers[HttpRequestHeader.Cookie] = cookie;
+            string playList = wc.DownloadString(playListRequest);
+            List<string> playListItems = playList.Split(new char[] { '\n' }).Where(item => item.EndsWith(".ts")).ToList();
+            foreach (string currentItem in playListItems) {
+                yield return currentItem.Replace("index.m3u8", currentItem);
             }
-
-
-
-            return null;
         }
 
         public static string GetM3U8PlaylistUrl(PlexServer plexServer, string partKey) {
@@ -164,14 +178,23 @@ namespace PlexMediaClient.Util {
             return plexServer.UriPlexBase.AbsoluteUri + "video/:/transcode/segmented/" + session;
         }
 
-        internal static void BufferMedia(PlexServer plexServer, string p) {
-            plexServer.AddAuthHeaders(ref _mediaFetcher);
-            _mediaBufferer.RunWorkerAsync(GetM3U8Playlist(plexServer, p));
+        private static void BufferMediaAsync(MediaContainerVideo mediaContainerVideo) {
+            StopBuffering();
+            _mediaBufferer.RunWorkerAsync(mediaContainerVideo);
+        }
+
+        internal static void BufferMedia(MediaContainerVideo mediaContainerVideo) {
+            BufferMedia(mediaContainerVideo, _defaultQuality, _defaultQuality);
+        }
+
+        internal static void BufferMedia(MediaContainerVideo mediaContainerVideo, int quality, int buffer) {
+            Quality = quality;
+            Buffer = buffer;
+            BufferMediaAsync(mediaContainerVideo);
         }
 
         internal static void StopBuffering() {
-            _mediaBufferer.CancelAsync();           
-           
+            _mediaBufferer.CancelAsync();
         }
     }
 }

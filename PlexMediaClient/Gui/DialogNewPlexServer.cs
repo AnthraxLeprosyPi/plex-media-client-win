@@ -14,6 +14,13 @@ namespace PlexMediaClient.Gui {
             InitializeComponent();
         }
 
+        public DialogNewPlexServer(PlexServer plexServer) {
+            InitializeComponent();
+            this.textBoxHost.Text = plexServer.HostAdress;
+            this.textBoxName.Text = plexServer.HostName;
+            NewServer = plexServer;
+        }
+
         public PlexServer NewServer { get; set; }
 
         private void buttonConnect_Click(object sender, EventArgs e) {

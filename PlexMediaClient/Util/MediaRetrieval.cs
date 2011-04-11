@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using PlexMediaClient.Plex.Xml;
 using System.Drawing;
 using PlexMediaClient.Gui;
 using System.Net;
 using System.IO;
+using PlexMediaClient.Plex;
 
 namespace PlexMediaClient.Util {
     static class MediaRetrieval {
@@ -54,10 +54,10 @@ namespace PlexMediaClient.Util {
 
         internal static void DownloadImage(string imageIndex) {
             WebClient ArtWorkRetriever = new WebClient();
-            ServerManager.Instance.PlexServerCurrent.AddAuthHeaders(ref ArtWorkRetriever);
+            PlexInterface.PlexServerCurrent.AddAuthHeaders(ref ArtWorkRetriever);
             ArtWorkRetriever.DownloadDataCompleted += new DownloadDataCompletedEventHandler(ArtWorkRetriever_DownloadDataCompleted);
             ArtWorkRetriever.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ArtWorkRetriever_DownloadProgressChanged);
-            ArtWorkRetriever.DownloadDataAsync(new Uri(ServerManager.Instance.PlexServerCurrent.UriPlexBase, imageIndex), imageIndex);
+            ArtWorkRetriever.DownloadDataAsync(new Uri(PlexInterface.PlexServerCurrent.UriPlexBase, imageIndex), imageIndex);
         }
 
         internal static void ShowLargeArtWork(Image largeArtWork) {

@@ -46,7 +46,7 @@ namespace PlexMediaClient.Plex {
         }
 
         public static MediaContainer TryGetPlexSections() {
-            return TryGetPlexSections(ServerManager.Instance.PlexServerCurrent);
+            return TryGetPlexSections(PlexServerCurrent);
         }
 
         public static MediaContainer TryGetPlexSections(PlexServer plexServer) {
@@ -102,5 +102,15 @@ namespace PlexMediaClient.Plex {
         internal static void RequestPlexItemsAsync(Uri path) {
             _webClient.DownloadDataAsync(path);
         }
+
+        internal static IEnumerable<string> GetAllVideoParts(MediaContainerVideo videoContainer) {
+            foreach (Media media in videoContainer.Media) {                
+                foreach (MediaPart part in media.Part) {
+                    yield return part.key;
+                }
+            }
+        }
+
+        public static PlexServer PlexServerCurrent { get { return ServerManager.Instance.PlexServerCurrent; } }
     }
 }
