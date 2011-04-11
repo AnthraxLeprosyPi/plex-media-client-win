@@ -20,8 +20,8 @@ namespace PlexMediaClient.Util {
         private static WebClient _mediaFetcher;
         private static int Quality { get; set; }
         private static int Buffer { get; set; }
-        private const string _bufferFile = @"D:\buffer.ts";
-        private const int _defaultBuffer = 5;
+        private const string _bufferFile = @"D:\buffer.mp4";
+        private const int _defaultBuffer = 3;
         private const int _defaultQuality = 5;
         private static FileStream _bufferedMedia;
 
@@ -47,9 +47,9 @@ namespace PlexMediaClient.Util {
 
         static void MediaBufferer_DoWork(object sender, DoWorkEventArgs e) {
             ResetMediaBuffer();
-            if (sender is MediaContainerVideo) {                
+            if (e.Argument is MediaContainerVideo) {                
                 int bufferedSegments = 0;
-                foreach (string currentPart in PlexInterface.GetAllVideoParts((MediaContainerVideo)sender)) {                    
+                foreach (string currentPart in PlexInterface.GetAllVideoParts((MediaContainerVideo)e.Argument)) {                    
                     foreach (string segment in GetM3U8PlaylistItems(PlexInterface.PlexServerCurrent, currentPart)) {
                         if (_mediaBufferer.CancellationPending) {
                             return;
@@ -132,7 +132,7 @@ namespace PlexMediaClient.Util {
             string playList = wc.DownloadString(playListRequest);
             List<string> playListItems = playList.Split(new char[] { '\n' }).Where(item => item.EndsWith(".ts")).ToList();
             foreach (string currentItem in playListItems) {
-                yield return currentItem.Replace("index.m3u8", currentItem);
+                yield return playListRequest.Replace("index.m3u8", currentItem);
             }
         }
 
@@ -180,7 +180,9 @@ namespace PlexMediaClient.Util {
 
         private static void BufferMediaAsync(MediaContainerVideo mediaContainerVideo) {
             StopBuffering();
-            _mediaBufferer.RunWorkerAsync(mediaContainerVideo);
+            if (!_mediaBufferer.IsBusy) {
+                _mediaBufferer.RunWorkerAsync(mediaContainerVideo);
+            }
         }
 
         internal static void BufferMedia(MediaContainerVideo mediaContainerVideo) {
