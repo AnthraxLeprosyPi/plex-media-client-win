@@ -112,5 +112,11 @@ namespace PlexMediaClient.Plex {
         }
 
         public static PlexServer PlexServerCurrent { get { return ServerManager.Instance.PlexServerCurrent; } }
+
+        public static bool Is3GConnected { get; set; }
+
+        public static bool IsLANConnected { get { return PlexServerCurrent.IsBonjour; } }
+
+        public static bool ShouldTranscode { get; set; }
     }
 }

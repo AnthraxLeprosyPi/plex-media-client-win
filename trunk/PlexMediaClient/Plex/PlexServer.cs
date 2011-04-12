@@ -5,6 +5,7 @@ using System.Text;
 using PlexMediaClient.Util;
 using System.Xml.Serialization;
 using System.Net;
+using PlexMediaClient.Plex.Xml;
 
 namespace PlexMediaClient.Plex {
     [Serializable]
@@ -15,8 +16,11 @@ namespace PlexMediaClient.Plex {
         public String UserName { get; set; }
         public String UserPass { get; set; }
 
-        public bool IsConnected { get; set; }
+        public PlexServerCapabilities ServerCapabilities { get; private set; }
+
+        [XmlIgnore]
         public bool IsBonjour { get; set; }
+
         const int PlexPort = 32400;
 
         public PlexServer() { }
@@ -53,19 +57,24 @@ namespace PlexMediaClient.Plex {
 
         public void AddAuthHeaders(ref WebClient webClient) {
             webClient.Headers["X-Plex-User"] = this.UserName;
-            webClient.Headers["X-Plex-Pass"] = this.UserPass;         
+            webClient.Headers["X-Plex-Pass"] = this.UserPass;
         }
 
         public bool Authenticate(ref WebClient webClient) {
             webClient.Headers["X-Plex-User"] = this.UserName;
             webClient.Headers["X-Plex-Pass"] = this.UserPass;
             try {
-                return !String.IsNullOrEmpty(webClient.DownloadString(this.UriPlexBase));
+                string serverXmlResponse = webClient.DownloadString(this.UriPlexBase);
+                SetServerCapabilities(XmlSerialization.DeSerializeXML<MediaContainer>(serverXmlResponse));
+                return ServerCapabilities != null;
             } catch (Exception e) {
                 //Log
                 return false;
             }
+        }
 
+        private void SetServerCapabilities(MediaContainer serverResponse) {
+            ServerCapabilities = new PlexServerCapabilities(serverResponse);
         }
     }
 }

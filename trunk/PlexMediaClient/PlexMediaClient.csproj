@@ -75,7 +75,9 @@
     <Compile Include="Gui\PlexItem.cs" />
     <Compile Include="Gui\PlexItemDirectory.cs" />
     <Compile Include="Gui\PlexItemVideo.cs" />
+    <Compile Include="Plex\PlexClientCapabilities.cs" />
     <Compile Include="Plex\PlexServer.cs" />
+    <Compile Include="Plex\PlexServerCapabilities.cs" />
     <Compile Include="Plex\Xml\PlexWebProtocol.cs">
       <DependentUpon>PlexWebProtocol.xsd</DependentUpon>
     </Compile>
