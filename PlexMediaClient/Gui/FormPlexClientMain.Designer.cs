@@ -35,14 +35,14 @@
             this.propertyGridDetails = new System.Windows.Forms.PropertyGrid();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
             this.pictureBoxArtWork = new System.Windows.Forms.PictureBox();
+            this.axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
             ((System.ComponentModel.ISupportInitialize)(this.MenuPane)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
             this.SuspendLayout();
             // 
             // MenuPane
@@ -161,6 +161,17 @@
             this.panel1.Size = new System.Drawing.Size(718, 613);
             this.panel1.TabIndex = 1;
             // 
+            // pictureBoxArtWork
+            // 
+            this.pictureBoxArtWork.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxArtWork.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxArtWork.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxArtWork.Name = "pictureBoxArtWork";
+            this.pictureBoxArtWork.Size = new System.Drawing.Size(718, 613);
+            this.pictureBoxArtWork.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxArtWork.TabIndex = 7;
+            this.pictureBoxArtWork.TabStop = false;
+            // 
             // axWindowsMediaPlayer1
             // 
             this.axWindowsMediaPlayer1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -172,17 +183,6 @@
             this.axWindowsMediaPlayer1.Size = new System.Drawing.Size(718, 613);
             this.axWindowsMediaPlayer1.TabIndex = 8;
             this.axWindowsMediaPlayer1.DoubleClickEvent += new AxWMPLib._WMPOCXEvents_DoubleClickEventHandler(this.axWindowsMediaPlayer1_DoubleClickEvent);
-            // 
-            // pictureBoxArtWork
-            // 
-            this.pictureBoxArtWork.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBoxArtWork.Location = new System.Drawing.Point(0, 0);
-            this.pictureBoxArtWork.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBoxArtWork.Name = "pictureBoxArtWork";
-            this.pictureBoxArtWork.Size = new System.Drawing.Size(718, 613);
-            this.pictureBoxArtWork.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBoxArtWork.TabIndex = 7;
-            this.pictureBoxArtWork.TabStop = false;
             // 
             // FormPlexClientMain
             // 
@@ -204,8 +204,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).EndInit();
             this.ResumeLayout(false);
 
         }

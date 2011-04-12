@@ -34,6 +34,21 @@ namespace PlexMediaClient.Gui {
             MediaRetrieval.OnDetailsRetrieved += new MediaRetrieval.OnDetailsRetrievedEventHandler(DetailsRetrieval_OnDetailsRetrieved);
             Transcoding.OnMediaReady += new Transcoding.OnMediaReadyEventHandler(Transcoding_OnMediaBuffered);
             axWindowsMediaPlayer1.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(axWindowsMediaPlayer1_PlayStateChange);
+            axWindowsMediaPlayer1.ErrorEvent += new EventHandler(axWindowsMediaPlayer1_ErrorEvent);
+            axWindowsMediaPlayer1.MediaError += new AxWMPLib._WMPOCXEvents_MediaErrorEventHandler(axWindowsMediaPlayer1_MediaError);
+            
+        }
+
+        void axWindowsMediaPlayer1_MediaError(object sender, AxWMPLib._WMPOCXEvents_MediaErrorEvent e) {
+            WMPLib.IWMPMedia2 errSource = e.pMediaObject as WMPLib.IWMPMedia2;
+            WMPLib.IWMPErrorItem errorItem = errSource.Error;
+            MessageBox.Show("Error " + errorItem.errorCode.ToString("X")
+                            + " in " + errSource.sourceURL);
+            throw new NotImplementedException();
+        }
+
+        void axWindowsMediaPlayer1_ErrorEvent(object sender, EventArgs e) {
+            throw new NotImplementedException();
         }
 
         private void axWindowsMediaPlayer1_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e) {
@@ -114,6 +129,7 @@ namespace PlexMediaClient.Gui {
             this.Invoke(new MethodInvoker(delegate() {
                 MenuPane.SuspendLayout();
                 MenuPane.InvalidateColumn(iconDataGridViewImageColumn.Index);
+                pictureBoxArtWork.Invalidate();                
                 Update();
                 MenuPane.ResumeLayout();
             }));

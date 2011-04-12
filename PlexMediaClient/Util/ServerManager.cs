@@ -52,9 +52,9 @@ namespace PlexMediaClient.Util {
             List<PlexServer> plexServers = new List<PlexServer>();
             if (File.Exists("PlexServers.xml")) {
                 try {
-                    plexServers = XmlSerialization.DeSerialize<List<PlexServer>>("PlexServers.xml");                    
-                } catch {
-                    //ToDo Log
+                    plexServers = XmlSerialization.DeSerialize<List<PlexServer>>("PlexServers.xml");
+                } catch (Exception e) {
+                    //throw e;
                 }
             }
             return plexServers;
@@ -68,8 +68,8 @@ namespace PlexMediaClient.Util {
             }
             try {
                 XmlSerialization.Serialize("PlexServers.xml", plexServers);
-            } catch {
-                //ToDo Log
+            } catch (Exception e){
+                throw e;
             }
         }
 

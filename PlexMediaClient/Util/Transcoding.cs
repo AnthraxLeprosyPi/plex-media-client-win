@@ -117,7 +117,7 @@ namespace PlexMediaClient.Util {
 
         private static void PlayBackTranscoded(MediaContainerVideo mediaContainerVideo) {
             PlexServerCapabilities currentCaps = PlexInterface.PlexServerCurrent.ServerCapabilities;
-            
+            BufferMedia(mediaContainerVideo);
             if (PlexInterface.Is3GConnected) {
 
             } else { 
@@ -126,7 +126,7 @@ namespace PlexMediaClient.Util {
         }
 
         private static void PlayBackLive(MediaContainerVideo mediaContainerVideo) {
-            OnMediaReady(PlexInterface.GetAllVideoParts(mediaContainerVideo).ToList());
+            OnMediaReady(PlexInterface.GetAllVideoParts(mediaContainerVideo).ToList().ConvertAll(part => PlexInterface.PlexServerCurrent.UriPlexBase + part));
         }
 
 
@@ -143,7 +143,7 @@ namespace PlexMediaClient.Util {
             string time = Math.Round(dTime / 1000).ToString();
 
             // the basic url WITH the part key is:
-            string url = "/video/:/transcode/segmented/start.m3u8?identifier=com.plexapp.plugins.library&offset=0&quality=5&url=http%3A%2F%2Flocalhost%3A32400" + Uri.EscapeDataString(partKey) + "&3g=0&httpCookies=&userAgent=";
+            string url = "/video/:/transcode/segmented/start.m3u8?identifier=com.plexapp.plugins.library&offset=0&quality=12&url=http%3A%2F%2Flocalhost%3A32400" + Uri.EscapeDataString(partKey) + "&3g=0";
             // the message to hash is url + an @ + the rounded time
             string msg = url + "@" + time;
             string publicKey = "KQMIY6GATPC63AIMC4R2";
@@ -168,6 +168,7 @@ namespace PlexMediaClient.Util {
             wc.Headers.Add("X-Plex-Access-Key", publicKey);
             wc.Headers.Add("X-Plex-Access-Time", time);
             wc.Headers.Add("X-Plex-Access-Code", token);
+            wc.Headers.Add("X-Plex-Client-Capabilities", PlexClientCapabilities.GetClientCapabilities());
 
             string response = wc.DownloadString(new Uri(plexServer.UriPlexBase, url));
             string session = response.Substring(response.IndexOf("session")).Replace("\n", "");
@@ -176,7 +177,7 @@ namespace PlexMediaClient.Util {
 
             string cookie = wc.ResponseHeaders[HttpResponseHeader.SetCookie];
 
-            wc = new WebClient();
+
 
             if (cookie != null && cookie.Length > 0)
                 wc.Headers[HttpRequestHeader.Cookie] = cookie;
