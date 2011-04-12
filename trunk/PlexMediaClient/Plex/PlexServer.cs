@@ -16,7 +16,7 @@ namespace PlexMediaClient.Plex {
         public String UserName { get; set; }
         public String UserPass { get; set; }
 
-        public PlexServerCapabilities ServerCapabilities { get; private set; }
+        public PlexServerCapabilities ServerCapabilities { get; set; }
 
         [XmlIgnore]
         public bool IsBonjour { get; set; }

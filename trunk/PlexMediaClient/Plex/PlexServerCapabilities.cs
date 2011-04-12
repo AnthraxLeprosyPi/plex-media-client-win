@@ -14,9 +14,11 @@ namespace PlexMediaClient.Plex {
         public List<string> TranscoderQualities { get; set; }
         public int SelectedQualityIndex { get; set; }
         public List<string> TranscoderVideoResolutions { get; set; }
-        public int SelectedVideoResolutionIndex { get; set; }       
+        public int SelectedVideoResolutionIndex { get; set; }
 
+        public PlexServerCapabilities() {
 
+        }
         public PlexServerCapabilities(MediaContainer serverBaseUriResponse) {
             
             /* 
