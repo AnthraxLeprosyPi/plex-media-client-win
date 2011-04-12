@@ -32,10 +32,12 @@ namespace PlexMediaClient.Gui {
             ServerItem = new MenuItem(RootItem, "Plex Servers");
             RootMenu = new List<IMenuItem>();
             RootMenu.Add(ServerItem);
+            RootMenu.Add(new ActionItem(null, "Settings", Properties.Resources.icon_server_online, () => MenuNavigation.ShowSettingsDialog()));
             RootMenu.Add(ExitItem);
             RootItem.SetChildItems(RootMenu);
-        }        
-             
+        }
+
+       
         static void PlexInterface_OnPlexError(Exception e) {
             OnErrorOccured(e);
         }
@@ -116,5 +118,10 @@ namespace PlexMediaClient.Gui {
         internal static void RefreshServerMenu() {
             PlexInterface.RefreshBonjourServers();
         }
+
+        private static object ShowSettingsDialog() {
+            throw new NotImplementedException();
+        }        
+             
     }
 }

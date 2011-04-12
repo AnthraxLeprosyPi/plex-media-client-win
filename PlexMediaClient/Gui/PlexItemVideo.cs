@@ -28,7 +28,7 @@ namespace PlexMediaClient.Gui {
         }
 
         public override void OnClicked(object sender, EventArgs e) {
-            Transcoding.BufferMedia(this.Video);
+            Transcoding.PlayBackMedia(this.Video);
         }
 
         public override void OnSelected() {

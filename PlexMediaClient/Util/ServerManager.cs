@@ -79,9 +79,11 @@ namespace PlexMediaClient.Util {
             PlexServerCurrent = server;
         }
 
-        void BonjourDiscovery_OnBonjourServer(PlexServer bojourDiscoveredServer) {
-            if (!PlexServers.Contains<PlexServer>(bojourDiscoveredServer)) {
-                PlexServers.Add(bojourDiscoveredServer);
+        void BonjourDiscovery_OnBonjourServer(PlexServer bonjourDiscoveredServer) {
+            if (PlexServers.Contains<PlexServer>(bonjourDiscoveredServer)) {
+                PlexServers.Find(x=> x.Equals(bonjourDiscoveredServer)).IsBonjour = true;
+            }else{
+                PlexServers.Add(bonjourDiscoveredServer);
                 OnPlexServersChanged(PlexServers);
             }
         }
