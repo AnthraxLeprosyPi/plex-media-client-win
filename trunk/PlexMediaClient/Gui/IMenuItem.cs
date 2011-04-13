@@ -10,7 +10,9 @@ namespace PlexMediaClient.Gui {
         IMenuItem Parent { get; set; }
         Uri Path { get; set; }
         String Title { get; set; }
-        Image Icon { get; }        
+        object Details { get; }
+        Image Icon { get; }
+        Image ArtWork { get; } 
         List<IMenuItem> ChildItems { get;}
         void OnClicked(object sender, EventArgs e);
         void OnPaint(object sender, DataGridViewCellPaintingEventArgs e);

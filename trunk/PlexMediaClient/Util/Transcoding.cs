@@ -119,7 +119,7 @@ namespace PlexMediaClient.Util {
             PlexServerCapabilities currentCaps = PlexInterface.PlexServerCurrent.ServerCapabilities;
             BufferMedia(mediaContainerVideo);
             if (PlexInterface.Is3GConnected) {
-
+                
             } else { 
                 
             }

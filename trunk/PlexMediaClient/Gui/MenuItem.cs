@@ -18,7 +18,15 @@ namespace PlexMediaClient.Gui {
         public string Title { get; set; }
         public List<IMenuItem> ChildItems { get; set; }
 
+        public virtual object Details {
+            get { return this; }
+        }
+
         public virtual System.Drawing.Image Icon {
+            get { return Properties.Resources.icon_empty_artwork; }
+        }
+
+        public virtual System.Drawing.Image ArtWork {
             get { return Properties.Resources.icon_empty_artwork; }
         }
 
@@ -43,9 +51,8 @@ namespace PlexMediaClient.Gui {
            // e.Paint(e.ClipBounds, e.PaintParts);
         }
              
-        public virtual void OnSelected() {
-            MediaRetrieval.ShowLargeArtWork(Icon);
-            MediaRetrieval.ShowDetails(this);
+        public virtual void OnSelected() {            
+           
         }
        
     }

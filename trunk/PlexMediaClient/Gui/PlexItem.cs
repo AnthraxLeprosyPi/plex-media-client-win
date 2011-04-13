@@ -21,6 +21,12 @@ namespace PlexMediaClient.Gui {
             }
         }
 
+        public override System.Drawing.Image ArtWork {
+            get {
+                return MediaRetrieval.GetArtWork(Path.AbsoluteUri);
+            }
+        }
+
         public override void OnClicked(object sender, EventArgs e) {
             try {
                 SetChildItems(MenuNavigation.GetSubMenuItems(this, PlexInterface.RequestPlexItems(Path)));

@@ -19,7 +19,19 @@ namespace PlexMediaClient.Gui {
 
         public override Image Icon {
             get {
-                return MediaRetrieval.GetArtWork(Video.thumb ?? Video.art);
+                return MediaRetrieval.GetArtWork(Video.thumb);
+            }
+        }
+
+        public override Image ArtWork {
+            get {
+                return MediaRetrieval.GetArtWork(Video.art ?? Video.thumb);
+            }
+        }
+
+        public override object Details {
+            get {
+                return Video;
             }
         }
 
@@ -32,8 +44,7 @@ namespace PlexMediaClient.Gui {
         }
 
         public override void OnSelected() {
-            MediaRetrieval.ShowLargeArtWork(MediaRetrieval.GetArtWork(Video.art ?? Video.thumb));
-            MediaRetrieval.ShowDetails(Video);
+            
         }
     }
 }

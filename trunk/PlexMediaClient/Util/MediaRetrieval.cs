@@ -13,11 +13,7 @@ namespace PlexMediaClient.Util {
     static class MediaRetrieval {
 
         public static event OnArtWorkRetrievedEventHandler OnArtWorkRetrieved;
-        public delegate void OnArtWorkRetrievedEventHandler();
-        public static event OnShowLargeArtWorkEventHandler OnShowLargeArtWork;
-        public delegate void OnShowLargeArtWorkEventHandler(Image largeArtWork);
-        public static event OnDetailsRetrievedEventHandler OnDetailsRetrieved;
-        public delegate void OnDetailsRetrievedEventHandler(object infoObject);
+        public delegate void OnArtWorkRetrievedEventHandler();                
         public static event OnPlayListRetrievedEventHandler OnPlayListRetrieved;
         public delegate void OnPlayListRetrievedEventHandler(object playList);
 
@@ -58,11 +54,7 @@ namespace PlexMediaClient.Util {
             ArtWorkRetriever.DownloadDataCompleted += new DownloadDataCompletedEventHandler(ArtWorkRetriever_DownloadDataCompleted);
             ArtWorkRetriever.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ArtWorkRetriever_DownloadProgressChanged);
             ArtWorkRetriever.DownloadDataAsync(new Uri(PlexInterface.PlexServerCurrent.UriPlexBase, imageIndex), imageIndex);
-        }
-
-        internal static void ShowLargeArtWork(Image largeArtWork) {
-            OnShowLargeArtWork(largeArtWork);
-        }
+        }        
 
         static void ArtWorkRetriever_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
             //throw new NotImplementedException();
@@ -86,10 +78,6 @@ namespace PlexMediaClient.Util {
                     }
                 }
             }
-        }
-        
-        internal static void ShowDetails(object infoObject) {
-            OnDetailsRetrieved(infoObject);
         }
     }
 }

@@ -30,14 +30,11 @@ namespace PlexMediaClient.Gui {
             MenuNavigation.OnMenuItemsFetched += new MenuNavigation.OnMenuItemsFetchedEventHandler(Navigation_OnItemsFetched);
             MenuNavigation.OnErrorOccured += new MenuNavigation.OnErrorOccuredEventHandler(Navigation_OnErrorOccured);
             MediaRetrieval.OnArtWorkRetrieved += new MediaRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);
-            MediaRetrieval.OnShowLargeArtWork += new MediaRetrieval.OnShowLargeArtWorkEventHandler(ArtWorkRetrieval_OnShowLargeArtWork);
-            MediaRetrieval.OnDetailsRetrieved += new MediaRetrieval.OnDetailsRetrievedEventHandler(DetailsRetrieval_OnDetailsRetrieved);
             Transcoding.OnMediaReady += new Transcoding.OnMediaReadyEventHandler(Transcoding_OnMediaBuffered);
             axWindowsMediaPlayer1.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(axWindowsMediaPlayer1_PlayStateChange);
             axWindowsMediaPlayer1.ErrorEvent += new EventHandler(axWindowsMediaPlayer1_ErrorEvent);
-            axWindowsMediaPlayer1.MediaError += new AxWMPLib._WMPOCXEvents_MediaErrorEventHandler(axWindowsMediaPlayer1_MediaError);
-            
-        }
+            axWindowsMediaPlayer1.MediaError += new AxWMPLib._WMPOCXEvents_MediaErrorEventHandler(axWindowsMediaPlayer1_MediaError);           
+        }       
 
         void axWindowsMediaPlayer1_MediaError(object sender, AxWMPLib._WMPOCXEvents_MediaErrorEvent e) {
             WMPLib.IWMPMedia2 errSource = e.pMediaObject as WMPLib.IWMPMedia2;
@@ -129,29 +126,9 @@ namespace PlexMediaClient.Gui {
             this.Invoke(new MethodInvoker(delegate() {
                 MenuPane.SuspendLayout();
                 MenuPane.InvalidateColumn(iconDataGridViewImageColumn.Index);
-                pictureBoxArtWork.Invalidate();                
-                Update();
-                MenuPane.ResumeLayout();
-            }));
-        }
-
-        void ArtWorkRetrieval_OnShowLargeArtWork(Image largeArtWork) {
-            this.Invoke(new MethodInvoker(delegate() {
-                pictureBoxArtWork.SuspendLayout();
-                pictureBoxArtWork.Image = largeArtWork;
                 pictureBoxArtWork.Invalidate();
                 Update();
-                pictureBoxArtWork.ResumeLayout();
-            }));
-        }
-
-        void DetailsRetrieval_OnDetailsRetrieved(object infoObject) {
-            this.Invoke(new MethodInvoker(delegate() {
-                propertyGridDetails.SuspendLayout();
-                propertyGridDetails.SelectedObject = infoObject;
-                propertyGridDetails.Invalidate();
-                Update();
-                propertyGridDetails.ResumeLayout();
+                MenuPane.ResumeLayout();
             }));
         }
 
@@ -274,14 +251,23 @@ namespace PlexMediaClient.Gui {
 
         private void menuPane_SelectionChanged(object sender, EventArgs e) {
             try {
+
                 pictureBoxArtWork.BringToFront();
                 axWindowsMediaPlayer1.SendToBack();
                 SelectedMenuItem = ((List<IMenuItem>)iMenuItemBindingSource.DataSource)[MenuPane.SelectedRows[0].Index];
+                pictureBoxArtWork.Image = SelectedMenuItem.ArtWork;                
+                propertyGridDetails.SelectedObject = SelectedMenuItem.Details;
+                //SuspendLayout();
+                pictureBoxArtWork.Invalidate();
+                propertyGridDetails.Invalidate();
+                Update();
+                //ResumeLayout();
                 if (SelectedMenuItem is PlexItemVideo) {
                     Expand();
                 }
                 SelectedMenuItem.OnSelected();
-            } catch { }
+            } catch { 
+            }
         }
 
         private void MenuPane_CellPainting(object sender, DataGridViewCellPaintingEventArgs e) {
