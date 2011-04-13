@@ -13,7 +13,7 @@ namespace PlexMediaClient.Util {
     static class MediaRetrieval {
 
         public static event OnArtWorkRetrievedEventHandler OnArtWorkRetrieved;
-        public delegate void OnArtWorkRetrievedEventHandler();                
+        public delegate void OnArtWorkRetrievedEventHandler(Image artWork);                
         public static event OnPlayListRetrievedEventHandler OnPlayListRetrieved;
         public delegate void OnPlayListRetrievedEventHandler(object playList);
 
@@ -72,7 +72,7 @@ namespace PlexMediaClient.Util {
                         using (MemoryStream ms = new MemoryStream(e.Result)) {
                             try {
                                 ImageCache[artWorkIndex] = Image.FromStream(ms);
-                                OnArtWorkRetrieved();
+                                OnArtWorkRetrieved(ImageCache[artWorkIndex]);
                             } catch { }
                         }
                     }

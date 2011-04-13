@@ -34,7 +34,7 @@ namespace PlexMediaClient.Plex {
         }
 
         public static string GetClientCapabilities() {
-            return String.Format("protocols={0};videoDecoders={1};audioDecoders={2}", String.Join(",", Protocols), String.Join(",", VideoDecoders), String.Join(",", AudioDecoders));
+            return "&X-Plex-Client-Capabilities=" + Uri.EscapeDataString(String.Format("protocols={0};videoDecoders={1};audioDecoders={2};", String.Join(",", Protocols), String.Join(",", VideoDecoders), String.Join(",", AudioDecoders)));
         }
 
         /* http-live-streaming,

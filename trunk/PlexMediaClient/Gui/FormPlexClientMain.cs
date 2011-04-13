@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using PlexMediaClient.Plex;
 using PlexMediaClient.Util;
+using System.Linq;
 
 
 namespace PlexMediaClient.Gui {
@@ -19,11 +20,14 @@ namespace PlexMediaClient.Gui {
             }
         }
 
+        private List<IMenuItem> currentMenuItems;
+
         public FormPlexClientMain() {
             InitializeComponent();
             SetStyle(ControlStyles.OptimizedDoubleBuffer |
                         ControlStyles.UserPaint |
                         ControlStyles.AllPaintingInWmPaint, true);
+            currentMenuItems = new List<IMenuItem>();
             pictureBoxArtWork.BorderStyle = BorderStyle.None;
             MenuPane.MouseWheel += new MouseEventHandler(MenuPane_MouseWheel);
             MenuNavigation.OnClose += new MenuNavigation.OnCloseEventHandler(MenuNavigation_OnClose);
@@ -33,8 +37,8 @@ namespace PlexMediaClient.Gui {
             Transcoding.OnMediaReady += new Transcoding.OnMediaReadyEventHandler(Transcoding_OnMediaBuffered);
             axWindowsMediaPlayer1.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(axWindowsMediaPlayer1_PlayStateChange);
             axWindowsMediaPlayer1.ErrorEvent += new EventHandler(axWindowsMediaPlayer1_ErrorEvent);
-            axWindowsMediaPlayer1.MediaError += new AxWMPLib._WMPOCXEvents_MediaErrorEventHandler(axWindowsMediaPlayer1_MediaError);           
-        }       
+            axWindowsMediaPlayer1.MediaError += new AxWMPLib._WMPOCXEvents_MediaErrorEventHandler(axWindowsMediaPlayer1_MediaError);
+        }
 
         void axWindowsMediaPlayer1_MediaError(object sender, AxWMPLib._WMPOCXEvents_MediaErrorEvent e) {
             WMPLib.IWMPMedia2 errSource = e.pMediaObject as WMPLib.IWMPMedia2;
@@ -55,10 +59,10 @@ namespace PlexMediaClient.Gui {
                 case WMPLib.WMPPlayState.wmppsLast:
                     break;
                 case WMPLib.WMPPlayState.wmppsMediaEnded:
-                    this.Invoke(new MethodInvoker(delegate() {
-                        this.axWindowsMediaPlayer1.SendToBack();
-                        this.pictureBoxArtWork.BringToFront();
-                    }));
+                    //this.Invoke(new MethodInvoker(delegate() {
+                    //    this.axWindowsMediaPlayer1.SendToBack();
+                    //    this.pictureBoxArtWork.BringToFront();
+                    //}));
                     break;
                 case WMPLib.WMPPlayState.wmppsPaused:
                     break;
@@ -110,6 +114,7 @@ namespace PlexMediaClient.Gui {
                 } else {
                     MenuPane.Rows[MenuPane.SelectedRows[0].Index + 1].Selected = true;
                 }
+                MenuPane.FirstDisplayedScrollingRowIndex = MenuPane.SelectedRows[0].Index;
             } catch {
             }
         }
@@ -122,10 +127,11 @@ namespace PlexMediaClient.Gui {
 
         private IMenuItem SelectedMenuItem { get; set; }
 
-        void ArtWorkRetrieval_OnArtWorkRetrieved() {
+        void ArtWorkRetrieval_OnArtWorkRetrieved(Image artWork) {
             this.Invoke(new MethodInvoker(delegate() {
                 MenuPane.SuspendLayout();
-                MenuPane.InvalidateColumn(iconDataGridViewImageColumn.Index);
+                currentMenuItems.Where(item => item.ArtWork == artWork).ToList().ForEach(x => MenuPane.InvalidateCell(iconDataGridViewImageColumn.Index, currentMenuItems.IndexOf(x)));
+                //MenuPane.InvalidateColumn(iconDataGridViewImageColumn.Index);
                 pictureBoxArtWork.Invalidate();
                 Update();
                 MenuPane.ResumeLayout();
@@ -139,7 +145,7 @@ namespace PlexMediaClient.Gui {
 
         void Navigation_OnItemsFetched(List<IMenuItem> fetchedItems) {
             Cursor = Cursors.Default;
-            this.Invoke(new MethodInvoker(delegate() { iMenuItemBindingSource.DataSource = fetchedItems; iMenuItemBindingSource.ResetBindings(false); }));
+            this.Invoke(new MethodInvoker(delegate() { iMenuItemBindingSource.DataSource = currentMenuItems = fetchedItems; iMenuItemBindingSource.ResetBindings(false); }));
         }
 
         protected override void OnLoad(EventArgs e) {
@@ -213,8 +219,8 @@ namespace PlexMediaClient.Gui {
                 case Keys.BrowserBack:
                 case Keys.Escape:
                     MenuNavigation.FetchPreviousMenu(SelectedMenuItem.Parent);
-                    MenuPane.ClearSelection();
-                    SelectedMenuItem = null;
+                    MenuPane.Rows[0].Selected = true;
+                    
                     break;
                 case Keys.Alt | Keys.F4:
                     this.Close();
@@ -243,8 +249,12 @@ namespace PlexMediaClient.Gui {
         private void Expand() {
             int maxWidth = Screen.GetWorkingArea(this).Width;
             Rectangle bounds = Bounds;
-            while (bounds.Width < maxWidth) {
-                bounds.Width += 50;
+            while (maxWidth - bounds.Width > 0) {
+                if (maxWidth - bounds.Width - 50 > 0) {
+                    bounds.Width += 50;
+                } else {
+                    bounds.Width = maxWidth;
+                }
                 Bounds = bounds;
             }
         }
@@ -254,8 +264,8 @@ namespace PlexMediaClient.Gui {
 
                 pictureBoxArtWork.BringToFront();
                 axWindowsMediaPlayer1.SendToBack();
-                SelectedMenuItem = ((List<IMenuItem>)iMenuItemBindingSource.DataSource)[MenuPane.SelectedRows[0].Index];
-                pictureBoxArtWork.Image = SelectedMenuItem.ArtWork;                
+                SelectedMenuItem = currentMenuItems[MenuPane.SelectedRows[0].Index];
+                pictureBoxArtWork.Image = SelectedMenuItem.ArtWork;
                 propertyGridDetails.SelectedObject = SelectedMenuItem.Details;
                 //SuspendLayout();
                 pictureBoxArtWork.Invalidate();
@@ -264,15 +274,17 @@ namespace PlexMediaClient.Gui {
                 //ResumeLayout();
                 if (SelectedMenuItem is PlexItemVideo) {
                     Expand();
+                } else {
+
                 }
                 SelectedMenuItem.OnSelected();
-            } catch { 
+            } catch {
             }
         }
 
         private void MenuPane_CellPainting(object sender, DataGridViewCellPaintingEventArgs e) {
             if (e.ColumnIndex == titleDataGridViewTextBoxColumn.Index) {
-                ((List<IMenuItem>)iMenuItemBindingSource.DataSource)[e.RowIndex].OnPaint(sender, e);
+                currentMenuItems[e.RowIndex].OnPaint(sender, e);
             }
         }
 

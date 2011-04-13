@@ -17,13 +17,15 @@ namespace PlexMediaClient.Util {
         public delegate void OnMediaReadyEventHandler(List<string> mediaFileName);
         private static AutoResetEvent _cancelationDoneEvent = new AutoResetEvent(false);
 
+        private const string _plexApiPublicKey = "KQMIY6GATPC63AIMC4R2";
+        private const string _plexApiSharedSecret = "k3U6GLkZOoNIoSgjDshPErvqMIFdE0xMTx8kgsrhnC0=";
 
         private static BackgroundWorker _mediaBufferer;
         private static WebClient _mediaFetcher;
         private static int Quality { get; set; }
         private static int Buffer { get; set; }
         private const string _bufferFile = @"D:\buffer.ts";
-        private const int _defaultBuffer = 3;
+        private const int _defaultBuffer = 2;
         private const int _defaultQuality = 5;
         private static FileStream _bufferedMedia;
 
@@ -49,12 +51,12 @@ namespace PlexMediaClient.Util {
             _bufferedMedia = new FileStream(_bufferFile, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
             PlexInterface.PlexServerCurrent.AddAuthHeaders(ref _mediaFetcher);
         }
-        
+
         static void MediaBufferer_DoWork(object sender, DoWorkEventArgs e) {
             ResetMediaBuffer();
-            if (e.Argument is MediaContainerVideo) {                
+            if (e.Argument is MediaContainerVideo) {
                 int bufferedSegments = 0;
-                foreach (string currentPart in PlexInterface.GetAllVideoParts((MediaContainerVideo)e.Argument)) {                    
+                foreach (string currentPart in PlexInterface.GetAllVideoParts((MediaContainerVideo)e.Argument)) {
                     foreach (string segment in GetM3U8PlaylistItems(PlexInterface.PlexServerCurrent, currentPart)) {
                         if (_mediaBufferer.CancellationPending) {
                             e.Cancel = true;
@@ -65,9 +67,9 @@ namespace PlexMediaClient.Util {
                         _bufferedMedia.Flush();
                         _mediaBufferer.ReportProgress((int)_bufferedMedia.Length);
                         if (++bufferedSegments == Buffer) {
-                            OnMediaReady(new List<string>{_bufferFile});
+                            OnMediaReady(new List<string> { _bufferFile });
                         }
-                    }       
+                    }
                 }
                 _mediaFetcher.Dispose();
                 _bufferedMedia.Close();
@@ -76,159 +78,97 @@ namespace PlexMediaClient.Util {
 
         static void MediaBufferer_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             Console.WriteLine(e.ProgressPercentage);
-        } 
-        
+        }
+
         static void _mediaBufferer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             _cancelationDoneEvent.Set();
-        }      
+        }
 
         private static void BufferMediaAsync(MediaContainerVideo mediaContainerVideo) {
-            
+
             if (!_mediaBufferer.IsBusy) {
                 _mediaBufferer.RunWorkerAsync(mediaContainerVideo);
             }
-        }
-
-        internal static void BufferMedia(MediaContainerVideo mediaContainerVideo) {            
-            BufferMedia(mediaContainerVideo, _defaultQuality, _defaultQuality);
-        }
-
-        internal static void BufferMedia(MediaContainerVideo mediaContainerVideo, int quality, int buffer) {
-            Quality = quality;
-            Buffer = buffer;
-            BufferMediaAsync(mediaContainerVideo);
-        }
+        }     
 
         internal static void StopBuffering() {
             if (_mediaBufferer.IsBusy) {
                 _mediaBufferer.CancelAsync();
-                _cancelationDoneEvent.WaitOne();
+                _cancelationDoneEvent.WaitOne(5000);
             }
         }
 
         internal static void PlayBackMedia(MediaContainerVideo mediaContainerVideo) {
             StopBuffering();
-            if (PlexInterface.IsLANConnected){
-                PlayBackLive(mediaContainerVideo);                
-            } else {
-                PlayBackTranscoded(mediaContainerVideo);
-            }
+            BufferMediaAsync(mediaContainerVideo);
         }
-
-        private static void PlayBackTranscoded(MediaContainerVideo mediaContainerVideo) {
-            PlexServerCapabilities currentCaps = PlexInterface.PlexServerCurrent.ServerCapabilities;
-            BufferMedia(mediaContainerVideo);
-            if (PlexInterface.Is3GConnected) {
-                
-            } else { 
-                
-            }
-        }
-
-        private static void PlayBackLive(MediaContainerVideo mediaContainerVideo) {
-            OnMediaReady(PlexInterface.GetAllVideoParts(mediaContainerVideo).ToList().ConvertAll(part => PlexInterface.PlexServerCurrent.UriPlexBase + part));
-        }
-
-
-        
-
 
         public static IEnumerable<string> GetM3U8PlaylistItems(PlexServer plexServer, string partKey) {
-            // unix time is the number of milliseconds from 1/1/1970 to now..          
-            DateTime jan1 = new DateTime(1970, 1, 1, 0, 0, 0);
-
-            double dTime = (DateTime.Now - jan1).TotalMilliseconds;
-
-            // as per the Javascript example, round up the Unix time
-            string time = Math.Round(dTime / 1000).ToString();
-
-            // the basic url WITH the part key is:
-            string url = "/video/:/transcode/segmented/start.m3u8?identifier=com.plexapp.plugins.library&offset=0&quality=12&url=http%3A%2F%2Flocalhost%3A32400" + Uri.EscapeDataString(partKey) + "&3g=0";
-            // the message to hash is url + an @ + the rounded time
-            string msg = url + "@" + time;
-            string publicKey = "KQMIY6GATPC63AIMC4R2";
-            byte[] privateKey = Convert.FromBase64String("k3U6GLkZOoNIoSgjDshPErvqMIFdE0xMTx8kgsrhnC0=");
-
-            // initialize a new HMACSHA256 class with the private key from Elan
-            HMACSHA256 hmac = new HMACSHA256(privateKey);
-
-            // compute the hash of the message. Note: .net is unicode double byte, so when we get the bytes
-            // from the message we have to be sure to use UTF8 decoders.
-
-            hmac.ComputeHash(UTF8Encoding.UTF8.GetBytes(msg));
-
-            //our new super secret token is our new hash converted to a Base64 string
-            string token = Convert.ToBase64String(hmac.Hash);
-
-            // now that we have our information, it's time to make the HTTP request.
-            // Step 1: create a new web client
-            WebClient wc = new WebClient();
-            plexServer.AddAuthHeaders(ref wc);
-            // Step 2: add the magic headers with the values we just computed.
-            wc.Headers.Add("X-Plex-Access-Key", publicKey);
-            wc.Headers.Add("X-Plex-Access-Time", time);
-            wc.Headers.Add("X-Plex-Access-Code", token);
-            wc.Headers.Add("X-Plex-Client-Capabilities", PlexClientCapabilities.GetClientCapabilities());
-
-            string response = wc.DownloadString(new Uri(plexServer.UriPlexBase, url));
+            string response = _mediaFetcher.DownloadString(GetM3U8PlaylistUrl(plexServer, partKey));
             string session = response.Substring(response.IndexOf("session")).Replace("\n", "");
 
             string playListRequest = plexServer.UriPlexBase.AbsoluteUri + "video/:/transcode/segmented/" + session;
 
-            string cookie = wc.ResponseHeaders[HttpResponseHeader.SetCookie];
-
-
-
+            string cookie = _mediaFetcher.ResponseHeaders[HttpResponseHeader.SetCookie];
             if (cookie != null && cookie.Length > 0)
-                wc.Headers[HttpRequestHeader.Cookie] = cookie;
-            string playList = wc.DownloadString(playListRequest);
+                _mediaFetcher.Headers[HttpRequestHeader.Cookie] = cookie;
+            string playList = _mediaFetcher.DownloadString(playListRequest);
             List<string> playListItems = playList.Split(new char[] { '\n' }).Where(item => item.EndsWith(".ts")).ToList();
             foreach (string currentItem in playListItems) {
                 yield return playListRequest.Replace("index.m3u8", currentItem);
             }
         }
 
-        public static string GetM3U8PlaylistUrl(PlexServer plexServer, string partKey) {
-            // unix time is the number of milliseconds from 1/1/1970 to now..          
-            DateTime jan1 = new DateTime(1970, 1, 1, 0, 0, 0);
+        public static Uri GetM3U8PlaylistUrl(PlexServer plexServer, string partKey, long offset = 0, int quality = _defaultQuality, bool is3G = false) {
+            string transcodePath = "/video/:/transcode/segmented/start.m3u8?";
+            transcodePath += "identifier=com.plexapp.plugins.library";
+            transcodePath += "&offset=" + offset;
+            transcodePath += "&qualitiy=" + quality;
+            transcodePath += "&3g=" + (is3G ? "1" : "0");                          
+            transcodePath += "&url=" + Uri.EscapeDataString("http://localhost:32400" + partKey);
+            transcodePath += GetPlexAuthParameters(plexServer, transcodePath);
+            transcodePath += PlexClientCapabilities.GetClientCapabilities();
+            transcodePath += "&httpCookies=";
+            transcodePath += "&userAgent=";     
 
-            double dTime = (DateTime.Now - jan1).TotalMilliseconds;
+            return new Uri(plexServer.UriPlexBase + transcodePath.Remove(0,1));
+        }
 
-            // as per the Javascript example, round up the Unix time
-            string time = Math.Round(dTime / 1000).ToString();
+        private static string GetPlexAuthParameters(PlexServer plexServer, string url) {
+            string time = GetUnixTime();
+            string authParameters = string.Empty;
+            authParameters += "&X-Plex-User=" + plexServer.UserName;
+            authParameters += "&X-Plex-Pass=" + plexServer.UserPass;
+            authParameters += "&X-Plex-Access-Key=" + _plexApiPublicKey;
+            authParameters += "&X-Plex-Access-Time=" + time;
+            authParameters += "&X-Plex-Access-Code=" + Uri.EscapeDataString(GetPlexApiToken(url, time));
+            return authParameters;
+        }
 
-            // the basic url WITH the part key is:
-            string url = "/video/:/transcode/segmented/start.m3u8?identifier=com.plexapp.plugins.library&offset=0&quality=5&url=http%3A%2F%2Flocalhost%3A32400" + Uri.EscapeDataString(partKey) + "&3g=0&httpCookies=&userAgent=";
-            // the message to hash is url + an @ + the rounded time
+        private static string GetPlexApiToken(string url, string time) {
+            // the message to hash is url + an @ + the rounded time   
             string msg = url + "@" + time;
-            string publicKey = "KQMIY6GATPC63AIMC4R2";
-            byte[] privateKey = Convert.FromBase64String("k3U6GLkZOoNIoSgjDshPErvqMIFdE0xMTx8kgsrhnC0=");
+            byte[] privateKey = Convert.FromBase64String(_plexApiSharedSecret);
 
             // initialize a new HMACSHA256 class with the private key from Elan
             HMACSHA256 hmac = new HMACSHA256(privateKey);
 
             // compute the hash of the message. Note: .net is unicode double byte, so when we get the bytes
             // from the message we have to be sure to use UTF8 decoders.
-
             hmac.ComputeHash(UTF8Encoding.UTF8.GetBytes(msg));
 
             //our new super secret token is our new hash converted to a Base64 string
-            string token = Convert.ToBase64String(hmac.Hash);
+            return Convert.ToBase64String(hmac.Hash);
+        }
 
-            // now that we have our information, it's time to make the HTTP request.
-            // Step 1: create a new web client
-            WebClient wc = new WebClient();
-            plexServer.AddAuthHeaders(ref wc);
-            // Step 2: add the magic headers with the values we just computed.
-            wc.Headers.Add("X-Plex-Access-Key", publicKey);
-            wc.Headers.Add("X-Plex-Access-Time", time);
-            wc.Headers.Add("X-Plex-Access-Code", token);
-            wc.Headers.Add("X-Plex-Client-Capabilities", PlexClientCapabilities.GetClientCapabilities());
-
-            string response = wc.DownloadString(new Uri(plexServer.UriPlexBase, url));
-            string session = response.Substring(response.IndexOf("session")).Replace("\n", "");
-
-            return plexServer.UriPlexBase.AbsoluteUri + "video/:/transcode/segmented/" + session;
+        private static string GetUnixTime() {
+            // unix time is the number of milliseconds from 1/1/1970 to now..          
+            DateTime jan1 = new DateTime(1970, 1, 1, 0, 0, 0);
+            double dTime = (DateTime.Now - jan1).TotalMilliseconds;
+            // as per the Javascript example, round up the Unix time
+            string time = Math.Round(dTime / 1000).ToString();
+            // the basic url WITH the part key is:
+            return time;
         }
     }
 }
