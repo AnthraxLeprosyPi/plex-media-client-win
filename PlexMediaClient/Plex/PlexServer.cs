@@ -49,7 +49,7 @@ namespace PlexMediaClient.Plex {
         }
 
         [XmlIgnore]
-        public Uri UriPlexBase { get { return new UriBuilder("http", HostAdress, PlexPort).Uri; } }
+        public Uri UriPlexBase { get { return new UriBuilder("http", HostAdress, PlexPort,"").Uri; } }
 
         public bool Equals(PlexServer other) {
             return HostAdress.Equals(other.HostAdress);
