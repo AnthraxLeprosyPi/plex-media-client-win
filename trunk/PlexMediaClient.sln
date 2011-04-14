@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlexMediaClient", "PlexMediaClient\PlexMediaClient.csproj", "{BB00C762-7FA3-4CF5-AC92-5B527392152C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlexMediaClient.Test", "PlexMediaClient.Test\PlexMediaClient.Test.csproj", "{8E150181-219C-46B4-A53C-83E3C5960E69}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,10 +13,6 @@ Global
 		{BB00C762-7FA3-4CF5-AC92-5B527392152C}.Debug|x86.Build.0 = Debug|x86
 		{BB00C762-7FA3-4CF5-AC92-5B527392152C}.Release|x86.ActiveCfg = Release|x86
 		{BB00C762-7FA3-4CF5-AC92-5B527392152C}.Release|x86.Build.0 = Release|x86
-		{8E150181-219C-46B4-A53C-83E3C5960E69}.Debug|x86.ActiveCfg = Debug|x86
-		{8E150181-219C-46B4-A53C-83E3C5960E69}.Debug|x86.Build.0 = Debug|x86
-		{8E150181-219C-46B4-A53C-83E3C5960E69}.Release|x86.ActiveCfg = Release|x86
-		{8E150181-219C-46B4-A53C-83E3C5960E69}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
