@@ -8,14 +8,14 @@ using PlexMediaClient.Gui;
 using System.Net;
 using System.IO;
 using PlexMediaClient.Plex;
+using WMPLib;
+using PlexMediaClient.Plex.Xml;
 
 namespace PlexMediaClient.Util {
     static class MediaRetrieval {
 
         public static event OnArtWorkRetrievedEventHandler OnArtWorkRetrieved;
-        public delegate void OnArtWorkRetrievedEventHandler(Image artWork);                
-        public static event OnPlayListRetrievedEventHandler OnPlayListRetrieved;
-        public delegate void OnPlayListRetrievedEventHandler(object playList);
+        public delegate void OnArtWorkRetrievedEventHandler(Image artWork);     
 
         private static Dictionary<string, Image> ImageCache { get; set; }
 
@@ -79,5 +79,7 @@ namespace PlexMediaClient.Util {
                 }
             }
         }
+
+        
     }
 }

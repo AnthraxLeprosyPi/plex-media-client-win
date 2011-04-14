@@ -7,10 +7,13 @@ using System.Windows.Forms;
 using PlexMediaClient.Plex;
 using PlexMediaClient.Util;
 using System.Linq;
+using WMPLib;
 
 
 namespace PlexMediaClient.Gui {
     public partial class FormPlexClientMain : Form {
+
+        private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
         Image ImageConnectionState {
             get {
@@ -21,6 +24,7 @@ namespace PlexMediaClient.Gui {
         }
 
         private List<IMenuItem> currentMenuItems;
+        private static AutoResetEvent _playerBuffering = new AutoResetEvent(false);
 
         public FormPlexClientMain() {
             InitializeComponent();
@@ -30,14 +34,24 @@ namespace PlexMediaClient.Gui {
             currentMenuItems = new List<IMenuItem>();
             pictureBoxArtWork.BorderStyle = BorderStyle.None;
             MenuPane.MouseWheel += new MouseEventHandler(MenuPane_MouseWheel);
+            Transcoding.MediaPlayer = axWindowsMediaPlayer;
             MenuNavigation.OnClose += new MenuNavigation.OnCloseEventHandler(MenuNavigation_OnClose);
             MenuNavigation.OnMenuItemsFetched += new MenuNavigation.OnMenuItemsFetchedEventHandler(Navigation_OnItemsFetched);
             MenuNavigation.OnErrorOccured += new MenuNavigation.OnErrorOccuredEventHandler(Navigation_OnErrorOccured);
             MediaRetrieval.OnArtWorkRetrieved += new MediaRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);
-            Transcoding.OnMediaReady += new Transcoding.OnMediaReadyEventHandler(Transcoding_OnMediaBuffered);
-            axWindowsMediaPlayer1.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(axWindowsMediaPlayer1_PlayStateChange);
-            axWindowsMediaPlayer1.ErrorEvent += new EventHandler(axWindowsMediaPlayer1_ErrorEvent);
-            axWindowsMediaPlayer1.MediaError += new AxWMPLib._WMPOCXEvents_MediaErrorEventHandler(axWindowsMediaPlayer1_MediaError);
+            Transcoding.OnMediaReady += new Transcoding.OnMediaReadyEventHandler(Transcoding_OnMediaReady);
+            Transcoding.OnNewPlayList += new Transcoding.OnNewPlayListEventHandler(Transcoding_OnNewPlayList);
+            axWindowsMediaPlayer.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(axWindowsMediaPlayer1_PlayStateChange);
+            axWindowsMediaPlayer.ErrorEvent += new EventHandler(axWindowsMediaPlayer1_ErrorEvent);
+            axWindowsMediaPlayer.MediaError += new AxWMPLib._WMPOCXEvents_MediaErrorEventHandler(axWindowsMediaPlayer1_MediaError);
+            axWindowsMediaPlayer.PositionChange += new AxWMPLib._WMPOCXEvents_PositionChangeEventHandler(axWindowsMediaPlayer_PositionChange);   
+
+        }
+
+
+        void Transcoding_OnNewPlayList(IWMPPlaylist playlist) {
+            axWindowsMediaPlayer.currentPlaylist = playlist;
+            axWindowsMediaPlayer.Ctlcontrols.play();
         }
 
         void axWindowsMediaPlayer1_MediaError(object sender, AxWMPLib._WMPOCXEvents_MediaErrorEvent e) {
@@ -45,34 +59,40 @@ namespace PlexMediaClient.Gui {
             WMPLib.IWMPErrorItem errorItem = errSource.Error;
             MessageBox.Show("Error " + errorItem.errorCode.ToString("X")
                             + " in " + errSource.sourceURL);
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         void axWindowsMediaPlayer1_ErrorEvent(object sender, EventArgs e) {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
+        void axWindowsMediaPlayer_PositionChange(object sender, AxWMPLib._WMPOCXEvents_PositionChangeEvent e) {
+            logger.Debug("AxWindowsMediaPlayer - PositionChange: {0} -> {1}", e.oldPosition, e.newPosition);
+        }
+
+
         private void axWindowsMediaPlayer1_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e) {
+            logger.Debug("AxWindowsMediaPlayer - PlayStateChange: {0}", Enum.GetName(typeof(WMPPlayState), e.newState));
             switch ((WMPLib.WMPPlayState)e.newState) {
                 case WMPLib.WMPPlayState.wmppsBuffering:
                     break;
                 case WMPLib.WMPPlayState.wmppsLast:
                     break;
                 case WMPLib.WMPPlayState.wmppsMediaEnded:
-                    //this.Invoke(new MethodInvoker(delegate() {
-                    //    this.axWindowsMediaPlayer1.SendToBack();
-                    //    this.pictureBoxArtWork.BringToFront();
-                    //}));
                     break;
                 case WMPLib.WMPPlayState.wmppsPaused:
                     break;
                 case WMPLib.WMPPlayState.wmppsPlaying:
                     this.Invoke(new MethodInvoker(delegate() {
                         this.pictureBoxArtWork.SendToBack();
-                        this.axWindowsMediaPlayer1.BringToFront();
+                        this.axWindowsMediaPlayer.BringToFront();
                     }));
                     break;
                 case WMPLib.WMPPlayState.wmppsReady:
+                    Transcoding.BufferMedia(0);
+                    _playerBuffering.WaitOne();
+                    break;
+                case WMPLib.WMPPlayState.wmppsTransitioning:
                     break;
                 case WMPLib.WMPPlayState.wmppsReconnecting:
                     break;
@@ -82,11 +102,9 @@ namespace PlexMediaClient.Gui {
                     break;
                 case WMPLib.WMPPlayState.wmppsStopped:
                     this.Invoke(new MethodInvoker(delegate() {
-                        this.axWindowsMediaPlayer1.SendToBack();
+                        this.axWindowsMediaPlayer.SendToBack();
                         this.pictureBoxArtWork.BringToFront();
                     }));
-                    break;
-                case WMPLib.WMPPlayState.wmppsTransitioning:
                     break;
                 case WMPLib.WMPPlayState.wmppsUndefined:
                     break;
@@ -98,12 +116,8 @@ namespace PlexMediaClient.Gui {
         }
 
 
-        void Transcoding_OnMediaBuffered(List<string> playList) {
-            this.Invoke(new MethodInvoker(delegate() {
-                axWindowsMediaPlayer1.currentPlaylist.clear();
-                playList.ForEach(url => axWindowsMediaPlayer1.currentPlaylist.appendItem(axWindowsMediaPlayer1.newMedia(url)));
-                axWindowsMediaPlayer1.Ctlcontrols.play();
-            }));
+        void Transcoding_OnMediaReady() {
+            _playerBuffering.Set();
         }
 
 
@@ -149,6 +163,7 @@ namespace PlexMediaClient.Gui {
         }
 
         protected override void OnLoad(EventArgs e) {
+            logger.Info("Loading main form");
             Rectangle workingArea = Screen.GetWorkingArea(this);
             workingArea.Width = 300;
             Bounds = workingArea;
@@ -196,23 +211,23 @@ namespace PlexMediaClient.Gui {
                     }
                     break;
                 case Keys.MediaPlayPause:
-                    if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying) {
-                        axWindowsMediaPlayer1.Ctlcontrols.pause();
+                    if (axWindowsMediaPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying) {
+                        axWindowsMediaPlayer.Ctlcontrols.pause();
                     } else {
-                        axWindowsMediaPlayer1.Ctlcontrols.play();
+                        axWindowsMediaPlayer.Ctlcontrols.play();
                     }
                     break;
                 case Keys.Play:
-                    axWindowsMediaPlayer1.Ctlcontrols.play();
+                    axWindowsMediaPlayer.Ctlcontrols.play();
                     break;
                 case Keys.MediaNextTrack:
-                    axWindowsMediaPlayer1.Ctlcontrols.next();
+                    axWindowsMediaPlayer.Ctlcontrols.next();
                     break;
                 case Keys.MediaPreviousTrack:
-                    axWindowsMediaPlayer1.Ctlcontrols.previous();
+                    axWindowsMediaPlayer.Ctlcontrols.previous();
                     break;
                 case Keys.MediaStop:
-                    axWindowsMediaPlayer1.Ctlcontrols.stop();
+                    axWindowsMediaPlayer.Ctlcontrols.stop();
                     Transcoding.StopBuffering();
                     break;
                 case Keys.Back:
@@ -220,7 +235,7 @@ namespace PlexMediaClient.Gui {
                 case Keys.Escape:
                     MenuNavigation.FetchPreviousMenu(SelectedMenuItem.Parent);
                     MenuPane.Rows[0].Selected = true;
-                    
+
                     break;
                 case Keys.Alt | Keys.F4:
                     this.Close();
@@ -263,7 +278,7 @@ namespace PlexMediaClient.Gui {
             try {
 
                 pictureBoxArtWork.BringToFront();
-                axWindowsMediaPlayer1.SendToBack();
+                axWindowsMediaPlayer.SendToBack();
                 SelectedMenuItem = currentMenuItems[MenuPane.SelectedRows[0].Index];
                 pictureBoxArtWork.Image = SelectedMenuItem.ArtWork;
                 propertyGridDetails.SelectedObject = SelectedMenuItem.Details;
@@ -295,7 +310,7 @@ namespace PlexMediaClient.Gui {
 
         private void axWindowsMediaPlayer1_DoubleClickEvent(object sender, AxWMPLib._WMPOCXEvents_DoubleClickEvent e) {
             try {
-                axWindowsMediaPlayer1.fullScreen = !axWindowsMediaPlayer1.fullScreen;
+                axWindowsMediaPlayer.fullScreen = !axWindowsMediaPlayer.fullScreen;
             } catch { }
         }
     }

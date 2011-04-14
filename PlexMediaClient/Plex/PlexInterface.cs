@@ -103,7 +103,7 @@ namespace PlexMediaClient.Plex {
             _webClient.DownloadDataAsync(path);
         }
 
-        internal static IEnumerable<string> GetAllVideoParts(MediaContainerVideo videoContainer) {
+        internal static IEnumerable<string> GetAllVideoPartKeys(MediaContainerVideo videoContainer) {
             foreach (Media media in videoContainer.Media) {                
                 foreach (MediaPart part in media.Part) {
                     yield return part.key;
