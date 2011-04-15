@@ -29,22 +29,22 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPlexClientMain));
             this.MenuPane = new System.Windows.Forms.DataGridView();
-            this.propertyGridDetails = new System.Windows.Forms.PropertyGrid();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.axWindowsMediaPlayer = new AxWMPLib.AxWindowsMediaPlayer();
-            this.pictureBoxArtWork = new System.Windows.Forms.PictureBox();
             this.iconDataGridViewImageColumn = new System.Windows.Forms.DataGridViewImageColumn();
             this.titleDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.iMenuItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.propertyGridDetails = new System.Windows.Forms.PropertyGrid();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.axVLCPlugin21 = new AxAXVLC.AxVLCPlugin2();
+            this.pictureBoxArtWork = new System.Windows.Forms.PictureBox();
+            this.axWindowsMediaPlayer = new AxWMPLib.AxWindowsMediaPlayer();
             ((System.ComponentModel.ISupportInitialize)(this.MenuPane)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.axVLCPlugin21)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer)).BeginInit();
             this.SuspendLayout();
             // 
             // MenuPane
@@ -92,6 +92,33 @@
             this.MenuPane.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.MenuPane_CellPainting);
             this.MenuPane.SelectionChanged += new System.EventHandler(this.menuPane_SelectionChanged);
             // 
+            // iconDataGridViewImageColumn
+            // 
+            this.iconDataGridViewImageColumn.DataPropertyName = "Icon";
+            this.iconDataGridViewImageColumn.HeaderText = "Icon";
+            this.iconDataGridViewImageColumn.Image = global::PlexMediaClient.Properties.Resources.icon_empty_artwork;
+            this.iconDataGridViewImageColumn.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
+            this.iconDataGridViewImageColumn.MinimumWidth = 75;
+            this.iconDataGridViewImageColumn.Name = "iconDataGridViewImageColumn";
+            this.iconDataGridViewImageColumn.ReadOnly = true;
+            this.iconDataGridViewImageColumn.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.iconDataGridViewImageColumn.Width = 75;
+            // 
+            // titleDataGridViewTextBoxColumn
+            // 
+            this.titleDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.titleDataGridViewTextBoxColumn.DataPropertyName = "Title";
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.titleDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle2;
+            this.titleDataGridViewTextBoxColumn.HeaderText = "Title";
+            this.titleDataGridViewTextBoxColumn.Name = "titleDataGridViewTextBoxColumn";
+            this.titleDataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // iMenuItemBindingSource
+            // 
+            this.iMenuItemBindingSource.DataSource = typeof(PlexMediaClient.Gui.IMenuItem);
+            // 
             // propertyGridDetails
             // 
             this.propertyGridDetails.CategoryForeColor = System.Drawing.Color.DarkOrange;
@@ -137,17 +164,15 @@
             this.panel1.Size = new System.Drawing.Size(718, 613);
             this.panel1.TabIndex = 1;
             // 
-            // axWindowsMediaPlayer
+            // axVLCPlugin21
             // 
-            this.axWindowsMediaPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.axWindowsMediaPlayer.Enabled = true;
-            this.axWindowsMediaPlayer.Location = new System.Drawing.Point(0, 0);
-            this.axWindowsMediaPlayer.Margin = new System.Windows.Forms.Padding(0);
-            this.axWindowsMediaPlayer.Name = "axWindowsMediaPlayer";
-            this.axWindowsMediaPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axWindowsMediaPlayer.OcxState")));
-            this.axWindowsMediaPlayer.Size = new System.Drawing.Size(718, 613);
-            this.axWindowsMediaPlayer.TabIndex = 8;
-            this.axWindowsMediaPlayer.DoubleClickEvent += new AxWMPLib._WMPOCXEvents_DoubleClickEventHandler(this.axWindowsMediaPlayer1_DoubleClickEvent);
+            this.axVLCPlugin21.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.axVLCPlugin21.Enabled = true;
+            this.axVLCPlugin21.Location = new System.Drawing.Point(0, 0);
+            this.axVLCPlugin21.Name = "axVLCPlugin21";
+            this.axVLCPlugin21.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axVLCPlugin21.OcxState")));
+            this.axVLCPlugin21.Size = new System.Drawing.Size(718, 613);
+            this.axVLCPlugin21.TabIndex = 9;
             // 
             // pictureBoxArtWork
             // 
@@ -160,42 +185,17 @@
             this.pictureBoxArtWork.TabIndex = 7;
             this.pictureBoxArtWork.TabStop = false;
             // 
-            // iconDataGridViewImageColumn
+            // axWindowsMediaPlayer
             // 
-            this.iconDataGridViewImageColumn.DataPropertyName = "Icon";
-            this.iconDataGridViewImageColumn.HeaderText = "Icon";
-            this.iconDataGridViewImageColumn.Image = global::PlexMediaClient.Properties.Resources.icon_empty_artwork;
-            this.iconDataGridViewImageColumn.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
-            this.iconDataGridViewImageColumn.MinimumWidth = 75;
-            this.iconDataGridViewImageColumn.Name = "iconDataGridViewImageColumn";
-            this.iconDataGridViewImageColumn.ReadOnly = true;
-            this.iconDataGridViewImageColumn.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.iconDataGridViewImageColumn.Width = 75;
-            // 
-            // titleDataGridViewTextBoxColumn
-            // 
-            this.titleDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.titleDataGridViewTextBoxColumn.DataPropertyName = "Title";
-            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.titleDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle2;
-            this.titleDataGridViewTextBoxColumn.HeaderText = "Title";
-            this.titleDataGridViewTextBoxColumn.Name = "titleDataGridViewTextBoxColumn";
-            this.titleDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // iMenuItemBindingSource
-            // 
-            this.iMenuItemBindingSource.DataSource = typeof(PlexMediaClient.Gui.IMenuItem);
-            // 
-            // axVLCPlugin21
-            // 
-            this.axVLCPlugin21.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.axVLCPlugin21.Enabled = true;
-            this.axVLCPlugin21.Location = new System.Drawing.Point(0, 0);
-            this.axVLCPlugin21.Name = "axVLCPlugin21";
-            this.axVLCPlugin21.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axVLCPlugin21.OcxState")));
-            this.axVLCPlugin21.Size = new System.Drawing.Size(718, 613);
-            this.axVLCPlugin21.TabIndex = 9;
+            this.axWindowsMediaPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.axWindowsMediaPlayer.Enabled = true;
+            this.axWindowsMediaPlayer.Location = new System.Drawing.Point(0, 0);
+            this.axWindowsMediaPlayer.Margin = new System.Windows.Forms.Padding(0);
+            this.axWindowsMediaPlayer.Name = "axWindowsMediaPlayer";
+            this.axWindowsMediaPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axWindowsMediaPlayer.OcxState")));
+            this.axWindowsMediaPlayer.Size = new System.Drawing.Size(718, 613);
+            this.axWindowsMediaPlayer.TabIndex = 8;
+            this.axWindowsMediaPlayer.DoubleClickEvent += new AxWMPLib._WMPOCXEvents_DoubleClickEventHandler(this.axWindowsMediaPlayer1_DoubleClickEvent);
             // 
             // FormPlexClientMain
             // 
@@ -214,12 +214,12 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.MenuPane)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.iMenuItemBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.axVLCPlugin21)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtWork)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer)).EndInit();
             this.ResumeLayout(false);
 
         }

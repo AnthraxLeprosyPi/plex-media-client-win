@@ -39,8 +39,8 @@ namespace PlexMediaClient.Gui {
             MenuNavigation.OnMenuItemsFetched += new MenuNavigation.OnMenuItemsFetchedEventHandler(Navigation_OnItemsFetched);
             MenuNavigation.OnErrorOccured += new MenuNavigation.OnErrorOccuredEventHandler(Navigation_OnErrorOccured);
             MediaRetrieval.OnArtWorkRetrieved += new MediaRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);
-            Transcoding.OnMediaReady += new Transcoding.OnMediaReadyEventHandler(Transcoding_OnMediaReady);
-            Transcoding.OnNewPlayList += new Transcoding.OnNewPlayListEventHandler(Transcoding_OnNewPlayList);
+            Transcoding.OnPlayBufferedMedia += new Transcoding.OnPlayBufferedMediaEventHandler(Transcoding_OnMediaReady);
+            Transcoding.OnPlayHttpAdaptiveStream += new Transcoding.OnPlayHttpAdaptiveStreamEventHandler(Transcoding_OnNewPlayList);
             axWindowsMediaPlayer.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(axWindowsMediaPlayer1_PlayStateChange);
             axWindowsMediaPlayer.ErrorEvent += new EventHandler(axWindowsMediaPlayer1_ErrorEvent);
             axWindowsMediaPlayer.MediaError += new AxWMPLib._WMPOCXEvents_MediaErrorEventHandler(axWindowsMediaPlayer1_MediaError);
