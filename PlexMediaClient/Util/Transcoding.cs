@@ -16,10 +16,10 @@ namespace PlexMediaClient.Util {
 
         private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public static event OnMediaReadyEventHandler OnMediaReady;
-        public delegate void OnMediaReadyEventHandler();
-        public static event OnNewPlayListEventHandler OnNewPlayList;
-        public delegate void OnNewPlayListEventHandler(IWMPPlaylist playlist);
+        public static event OnPlayBufferedMediaEventHandler OnPlayBufferedMedia;
+        public delegate void OnPlayBufferedMediaEventHandler(string localBufferPath);
+        public static event OnPlayHttpAdaptiveStreamEventHandler OnPlayHttpAdaptiveStream;
+        public delegate void OnPlayHttpAdaptiveStreamEventHandler(Uri m3u8Url);
         private static ManualResetEventSlim _safeCompletionEvent = new ManualResetEventSlim(false);
 
         private const string _plexApiPublicKey = "KQMIY6GATPC63AIMC4R2";
@@ -80,7 +80,7 @@ namespace PlexMediaClient.Util {
                     _bufferedMedia.Flush();
                     _mediaBufferer.ReportProgress((int)_bufferedMedia.Length);
                     if (++bufferedSegments == Buffer) {
-                        OnMediaReady();
+                        OnPlayBufferedMedia();
                     }
                 }
             }
@@ -125,7 +125,7 @@ namespace PlexMediaClient.Util {
                 IWMPMedia currentItem = MediaPlayer.newMedia(_bufferFile);               
                 newPlaylist.appendItem(currentItem);
             }
-            OnNewPlayList(newPlaylist);
+            OnPlayHttpAdaptiveStream(newPlaylist);
         }
 
         internal static void BufferMedia(int index, int offset = 0) {
