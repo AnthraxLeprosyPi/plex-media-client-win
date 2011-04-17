@@ -11,7 +11,7 @@ using PlexMediaClient.Util;
 using System.Threading;
 
 namespace PlexMediaClient.Plex {
-    static class PlexInterface {
+   public static class PlexInterface {
 
         private static WebClient _webClient;
         public static bool IsConnected { get; private set; }

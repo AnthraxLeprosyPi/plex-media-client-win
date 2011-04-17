@@ -23,8 +23,7 @@ namespace PlexMediaClient.Gui {
             }
         }
 
-        private List<IMenuItem> currentMenuItems;
-        private static AutoResetEvent _playerBuffering = new AutoResetEvent(false);
+        private List<IMenuItem> currentMenuItems;     
 
         public FormPlexClientMain() {
             InitializeComponent();
@@ -39,8 +38,8 @@ namespace PlexMediaClient.Gui {
             MenuNavigation.OnMenuItemsFetched += new MenuNavigation.OnMenuItemsFetchedEventHandler(Navigation_OnItemsFetched);
             MenuNavigation.OnErrorOccured += new MenuNavigation.OnErrorOccuredEventHandler(Navigation_OnErrorOccured);
             MediaRetrieval.OnArtWorkRetrieved += new MediaRetrieval.OnArtWorkRetrievedEventHandler(ArtWorkRetrieval_OnArtWorkRetrieved);
-            Transcoding.OnPlayBufferedMedia += new Transcoding.OnPlayBufferedMediaEventHandler(Transcoding_OnMediaReady);
-            Transcoding.OnPlayHttpAdaptiveStream += new Transcoding.OnPlayHttpAdaptiveStreamEventHandler(Transcoding_OnNewPlayList);
+            Transcoding.OnPlayBufferedMedia += new Transcoding.OnPlayBufferedMediaEventHandler(Transcoding_OnPlayBufferedMedia);
+            Transcoding.OnPlayHttpAdaptiveStream += new Transcoding.OnPlayHttpAdaptiveStreamEventHandler(Transcoding_OnPlayHttpAdaptiveStream);
             axWindowsMediaPlayer.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(axWindowsMediaPlayer1_PlayStateChange);
             axWindowsMediaPlayer.ErrorEvent += new EventHandler(axWindowsMediaPlayer1_ErrorEvent);
             axWindowsMediaPlayer.MediaError += new AxWMPLib._WMPOCXEvents_MediaErrorEventHandler(axWindowsMediaPlayer1_MediaError);
@@ -48,11 +47,15 @@ namespace PlexMediaClient.Gui {
 
         }
 
-
-        void Transcoding_OnNewPlayList(IWMPPlaylist playlist) {
-            axWindowsMediaPlayer.currentPlaylist = playlist;
-            axWindowsMediaPlayer.Ctlcontrols.play();
+        void Transcoding_OnPlayHttpAdaptiveStream(Uri m3u8Url) {
+            throw new NotImplementedException();
         }
+
+        void Transcoding_OnPlayBufferedMedia(string localBufferPath) {
+            axWindowsMediaPlayer.URL = localBufferPath;
+         
+        }
+
 
         void axWindowsMediaPlayer1_MediaError(object sender, AxWMPLib._WMPOCXEvents_MediaErrorEvent e) {
             WMPLib.IWMPMedia2 errSource = e.pMediaObject as WMPLib.IWMPMedia2;
@@ -88,9 +91,7 @@ namespace PlexMediaClient.Gui {
                         this.axWindowsMediaPlayer.BringToFront();
                     }));
                     break;
-                case WMPLib.WMPPlayState.wmppsReady:
-                    Transcoding.BufferMedia(0);
-                    _playerBuffering.WaitOne();
+                case WMPLib.WMPPlayState.wmppsReady:                  
                     break;
                 case WMPLib.WMPPlayState.wmppsTransitioning:
                     break;
@@ -102,6 +103,8 @@ namespace PlexMediaClient.Gui {
                     break;
                 case WMPLib.WMPPlayState.wmppsStopped:
                     this.Invoke(new MethodInvoker(delegate() {
+                        axWindowsMediaPlayer.URL = string.Empty;
+                        Transcoding.StopBuffering();
                         this.axWindowsMediaPlayer.SendToBack();
                         this.pictureBoxArtWork.BringToFront();
                     }));
@@ -115,12 +118,6 @@ namespace PlexMediaClient.Gui {
             }
         }
 
-
-        void Transcoding_OnMediaReady() {
-            _playerBuffering.Set();
-        }
-
-
         void MenuPane_MouseWheel(object sender, MouseEventArgs e) {
             try {
                 if (e.Delta > 0) {
@@ -132,9 +129,7 @@ namespace PlexMediaClient.Gui {
             } catch {
             }
         }
-
-
-
+        
         void MenuNavigation_OnClose(string reason) {
             Close();
         }
@@ -275,10 +270,7 @@ namespace PlexMediaClient.Gui {
         }
 
         private void menuPane_SelectionChanged(object sender, EventArgs e) {
-            try {
-
-                pictureBoxArtWork.BringToFront();
-                axWindowsMediaPlayer.SendToBack();
+            try {                
                 SelectedMenuItem = currentMenuItems[MenuPane.SelectedRows[0].Index];
                 pictureBoxArtWork.Image = SelectedMenuItem.ArtWork;
                 propertyGridDetails.SelectedObject = SelectedMenuItem.Details;

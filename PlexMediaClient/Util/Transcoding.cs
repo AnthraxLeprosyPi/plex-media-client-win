@@ -30,8 +30,8 @@ namespace PlexMediaClient.Util {
         private static int Quality { get; set; }
         private static int Buffer { get; set; }
         private const string _bufferFile = @"D:\buffer.ts";
-        private const int _defaultBuffer = 2;
-        private const int _defaultQuality = 5;
+        private const int _defaultBuffer = 3;
+        private const int _defaultQuality = 3;
         private static FileStream _bufferedMedia;
 
         static Transcoding() {
@@ -57,7 +57,7 @@ namespace PlexMediaClient.Util {
                 if (File.Exists(_bufferFile)) {
                     File.Delete(_bufferFile);
                 }
-                _bufferedMedia = new FileStream(_bufferFile, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
+                _bufferedMedia = new FileStream(_bufferFile, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);               
             } catch (Exception e) {
                 logger.FatalException("Unable reset local media buffer!", e);
             }
@@ -73,6 +73,7 @@ namespace PlexMediaClient.Util {
                     if (_mediaBufferer.CancellationPending) {
                         logger.Info("BackGroundWorker - CancellationPending detected - cancelling asynchronous buffering...");
                         e.Cancel = true;
+                        _safeCompletionEvent.Set();
                         return;
                     }
                     byte[] data = _mediaFetcher.DownloadData(segment);
@@ -80,7 +81,7 @@ namespace PlexMediaClient.Util {
                     _bufferedMedia.Flush();
                     _mediaBufferer.ReportProgress((int)_bufferedMedia.Length);
                     if (++bufferedSegments == Buffer) {
-                        OnPlayBufferedMedia();
+                        OnPlayBufferedMedia(_bufferFile);
                     }
                 }
             }
@@ -91,6 +92,7 @@ namespace PlexMediaClient.Util {
         }
 
         static void _mediaBufferer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+           
             if (e.Cancelled) {
                 logger.Warn("BackGroundWorker -Buffering completed and was cancelled");
             } else if (e.Error != null) {
@@ -98,7 +100,7 @@ namespace PlexMediaClient.Util {
             } else {
                 logger.Info("BackGroundWorker -Buffering completed and was successful");
             }
-            _safeCompletionEvent.Set();
+            
         }
 
         private static void BufferMediaAsync(IEnumerable<string> segmentedParts) {
@@ -106,30 +108,24 @@ namespace PlexMediaClient.Util {
             _mediaBufferer.RunWorkerAsync(segmentedParts);
         }
 
-        internal static void StopBuffering() {
-            logger.Info("Request Buffering Cancellation");
+        internal static void StopBuffering() {            
             if (_mediaBufferer.IsBusy) {
+                logger.Info("Request Buffering Cancellation");
                 _mediaBufferer.CancelAsync();
-                _safeCompletionEvent.Wait(20000);
+                _safeCompletionEvent.Wait();
             }
             ResetMediaBuffer();
         }
 
-        private static List<string> InternalPlayList { get; set; }
+
 
         internal static void PlayBackMedia(MediaContainerVideo video) {
-            IWMPPlaylist newPlaylist = MediaPlayer.newPlaylist(video.title, "");
-            InternalPlayList = new List<string>();
-            foreach (string currentPart in PlexInterface.GetAllVideoPartKeys(video)) {
-                InternalPlayList.Add(currentPart);
-                IWMPMedia currentItem = MediaPlayer.newMedia(_bufferFile);               
-                newPlaylist.appendItem(currentItem);
-            }
-            OnPlayHttpAdaptiveStream(newPlaylist);
+
+            BufferMedia(video.Media[0].Part[0].key);
         }
 
-        internal static void BufferMedia(int index, int offset = 0) {
-            BufferMediaAsync(GetM3U8PlaylistItems(PlexInterface.PlexServerCurrent, InternalPlayList[index]));
+        internal static void BufferMedia(string partKey,int offset = 0) {
+            BufferMediaAsync(GetM3U8PlaylistItems(PlexInterface.PlexServerCurrent, partKey));
         }
 
         static IEnumerable<string> GetM3U8PlaylistItems(PlexServer plexServer, string partKey) {
